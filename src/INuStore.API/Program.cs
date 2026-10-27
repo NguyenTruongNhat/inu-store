@@ -1,4 +1,13 @@
+using INuStore.Infrastructure.DependencyInjection.Options;
+using INuStore.Infrastructure.DependencyInjection.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
+
+
+// Configure Options and SQL
+builder.Services.ConfigureSqlServerRetryOptions(builder.Configuration.GetSection(nameof(SqlServerRetryOptions)));
+builder.Services.AddSqlConfiguration();
+builder.Services.AddRepositoryBaseConfiguration();
 
 // Add services to the container.
 

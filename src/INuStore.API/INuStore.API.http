@@ -1,0 +1,6 @@
+@INuStore.API_HostAddress = http://localhost:5157
+
+GET {{INuStore.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

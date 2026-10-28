@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace INuStore.Infrastructure.Repositories;
+
 public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey>, IDisposable
         where TEntity : DomainEntity<TKey>
 {

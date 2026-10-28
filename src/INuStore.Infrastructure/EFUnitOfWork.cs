@@ -1,6 +1,7 @@
 ﻿using INustore.UseCase.Abstractions.UnitOfWork;
 
 namespace INuStore.Infrastructure;
+
 public class EFUnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext _context;

@@ -57,6 +57,7 @@ public static class ServiceCollectionExtensions
         .ValidateDataAnnotations()
         .ValidateOnStart();
 
+
     public static void AddRepositoryBaseConfiguration(this IServiceCollection services)
     {
         services.AddTransient(typeof(IUnitOfWork), typeof(EFUnitOfWork));

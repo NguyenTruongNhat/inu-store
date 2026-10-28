@@ -4,7 +4,7 @@ using INuStore.Infrastructure.DependencyInjection.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 
-// Configure Options and SQL
+// Configure Options and SQL Server Retry Options
 builder.Services.ConfigureSqlServerRetryOptions(builder.Configuration.GetSection(nameof(SqlServerRetryOptions)));
 builder.Services.AddSqlConfiguration();
 builder.Services.AddRepositoryBaseConfiguration();

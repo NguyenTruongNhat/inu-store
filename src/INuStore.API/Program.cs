@@ -1,7 +1,19 @@
-using INuStore.Infrastructure.DependencyInjection.Options;
 using INuStore.Infrastructure.DependencyInjection.Extensions;
+using INuStore.Infrastructure.DependencyInjection.Options;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add Serilog configuration
+Log.Logger = new LoggerConfiguration().ReadFrom
+    .Configuration(builder.Configuration)
+    .CreateLogger();
+
+builder.Logging
+    .ClearProviders()
+    .AddSerilog();
+
+builder.Host.UseSerilog();
 
 
 // Configure Options and SQL Server Retry Options

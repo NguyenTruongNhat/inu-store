@@ -18,6 +18,25 @@ public static class ServiceCollectionExtensions
             var options = provider.GetRequiredService<IOptionsMonitor<SqlServerRetryOptions>>();
 
             #region ============== SQL-SERVER-STRATEGY-DbContext 1 ==============
+            //builder
+            //.EnableDetailedErrors(true)
+            //.EnableSensitiveDataLogging(true)
+            //.UseLazyLoadingProxies(true)
+            //.UseSqlServer(
+            //    connectionString: configuration.GetConnectionString("ConnectionStrings")
+            //    ,
+            //    sqlServerOptionsAction: optionsBuilder
+            //            => optionsBuilder.ExecutionStrategy(
+            //                    dependencies => new SqlServerRetryingExecutionStrategy(
+            //                        dependencies: dependencies,
+            //                        maxRetryCount: options.CurrentValue.MaxRetryCount,
+            //                        maxRetryDelay: options.CurrentValue.MaxRetryDelay,
+            //                        errorNumbersToAdd: options.CurrentValue.ErrorNumbersToAdd))
+            //                .MigrationsAssembly(typeof(ApplicationDbContext).Assembly.GetName().Name));
+
+            #endregion
+
+            #region ============== SQL-SERVER-STRATEGY- UnitOfWork 2 ==============
             builder
             .EnableDetailedErrors(true)
             .EnableSensitiveDataLogging(true)
@@ -25,25 +44,7 @@ public static class ServiceCollectionExtensions
             .UseSqlServer(
                 connectionString: configuration.GetConnectionString("ConnectionStrings"),
                 sqlServerOptionsAction: optionsBuilder
-                        => optionsBuilder.ExecutionStrategy(
-                                dependencies => new SqlServerRetryingExecutionStrategy(
-                                    dependencies: dependencies,
-                                    maxRetryCount: options.CurrentValue.MaxRetryCount,
-                                    maxRetryDelay: options.CurrentValue.MaxRetryDelay,
-                                    errorNumbersToAdd: options.CurrentValue.ErrorNumbersToAdd))
-                            .MigrationsAssembly(typeof(ApplicationDbContext).Assembly.GetName().Name));
-
-            #endregion
-
-            #region ============== SQL-SERVER-STRATEGY- UnitOfWork 2 ==============
-            //builder
-            //.EnableDetailedErrors(true)
-            //.EnableSensitiveDataLogging(true)
-            //.UseLazyLoadingProxies(true)
-            //.UseSqlServer(
-            //    connectionString: configuration.GetConnectionString("ConnectionStrings"),
-            //    sqlServerOptionsAction: optionsBuilder
-            //                => optionsBuilder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.GetName().Name));
+                            => optionsBuilder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.GetName().Name));
             #endregion\
         });
 

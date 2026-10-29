@@ -32,12 +32,15 @@ namespace INustore.UseCase.UseCases.V1.UserService
         {
             var user = new User
             {
-                UserName = request.UserName,
+                UserName = "nhatnguyen",
                 Email = request.Email,
                 PasswordHash = request.Password
             };
             _unitOfWork.UserRepository.Add(user);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            var user2 = new User { UserName = "nhatnguyen2", Email = "nhatnguyen2@example.com", PasswordHash = "hashedpassword2" };
+            _unitOfWork.UserRepository.Add(user2);
+
             return Result.Success();
         }
 

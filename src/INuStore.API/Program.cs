@@ -1,4 +1,5 @@
 using INustore.UseCase.DependencyInjection.Extensions;
+using INuStore.API.Middlewares;
 using INuStore.Infrastructure.DependencyInjection.Extensions;
 using INuStore.Infrastructure.DependencyInjection.Options;
 using Serilog;
@@ -43,6 +44,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+// Custom Middleware for Global transaction
+app.UseMiddleware<TransactionMiddleware>();
 
 app.MapControllers();
 

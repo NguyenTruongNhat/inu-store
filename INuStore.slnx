@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Docs/">
+    <File Path="Docs/why-savechangeasync-need-to-await.MD" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/INuStore.API/INuStore.API.csproj" />
     <Project Path="src/INuStore.Contract/INuStore.Contract.csproj" />

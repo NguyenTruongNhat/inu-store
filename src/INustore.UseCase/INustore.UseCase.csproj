@@ -14,4 +14,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.14" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\INuStore.Contract\INuStore.Contract.csproj" />
+    <ProjectReference Include="..\INuStore.Domain\INuStore.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

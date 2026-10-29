@@ -1,6 +1,40 @@
 @INuStore.API_HostAddress = http://localhost:5157
+@userId = 11111111-1111-1111-1111-111111111111
+@pageIndex = 1
+@pageSize = 10
 
-GET {{INuStore.API_HostAddress}}/weatherforecast/
+### Get all users
+GET {{INuStore.API_HostAddress}}/GetAllUsers?PageIndex={{pageIndex}}&PageSize={{pageSize}}
 Accept: application/json
 
-###
+### Get a user by ID (replace userId above with an existing user's ID)
+GET {{INuStore.API_HostAddress}}/GetUserById?UserId={{userId}}
+Accept: application/json
+
+### Create a user
+POST {{INuStore.API_HostAddress}}/CreateUser
+Content-Type: application/json
+
+{
+  "userName": "testuser",
+  "email": "testuser@example.com",
+  "password": "TestPassword123!"
+}
+
+### Update a user
+PUT {{INuStore.API_HostAddress}}/UpdateUser
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "userName": "updateduser",
+  "email": "updateduser@example.com"
+}
+
+### Delete a user
+DELETE {{INuStore.API_HostAddress}}/DeleteUser
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}"
+}

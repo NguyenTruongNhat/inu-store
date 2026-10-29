@@ -1,3 +1,4 @@
+using INustore.UseCase.DependencyInjection.Extensions;
 using INuStore.Infrastructure.DependencyInjection.Extensions;
 using INuStore.Infrastructure.DependencyInjection.Options;
 using Serilog;
@@ -15,11 +16,15 @@ builder.Logging
 
 builder.Host.UseSerilog();
 
-
+// Infrastructure Dependency Injection
 // Configure Options and SQL Server Retry Options
 builder.Services.ConfigureSqlServerRetryOptions(builder.Configuration.GetSection(nameof(SqlServerRetryOptions)));
 builder.Services.AddSqlConfiguration();
 builder.Services.AddRepositoryBaseConfiguration();
+
+
+// UseCase Dependency Injection
+builder.Services.AddAppServices();
 
 // Add services to the container.
 

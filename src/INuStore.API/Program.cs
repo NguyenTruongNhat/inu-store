@@ -17,6 +17,7 @@ builder.Logging
 
 builder.Host.UseSerilog();
 
+builder.Services.AddScoped<TransactionMiddleware>();
 // Infrastructure Dependency Injection
 // Configure Options and SQL Server Retry Options
 builder.Services.ConfigureSqlServerRetryOptions(builder.Configuration.GetSection(nameof(SqlServerRetryOptions)));

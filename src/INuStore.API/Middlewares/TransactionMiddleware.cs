@@ -2,18 +2,18 @@
 
 namespace INuStore.API.Middlewares
 {
-    public sealed class TransactionMiddleware
+    public sealed class TransactionMiddleware : IMiddleware
     {
-        private readonly RequestDelegate _next;
+        private readonly ApplicationDbContext _dbContext;
 
-        public TransactionMiddleware(RequestDelegate next)
+        public TransactionMiddleware(ApplicationDbContext dbContext)
         {
-            _next = next;
+            _dbContext = dbContext;
         }
 
         public async Task InvokeAsync(
             HttpContext context,
-            ApplicationDbContext dbContext)
+            RequestDelegate next)
         {
             // Chỉ áp dụng transaction cho request ghi dữ liệu.
             var method = context.Request.Method;
@@ -23,7 +23,7 @@ namespace INuStore.API.Middlewares
                 && !HttpMethods.IsPatch(method)
                 && !HttpMethods.IsDelete(method))
             {
-                await _next(context);
+                await next(context);
                 return;
             }
 
@@ -37,9 +37,9 @@ namespace INuStore.API.Middlewares
             try
             {
                 await using (var transaction =
-                    await dbContext.Database.BeginTransactionAsync(cancellationToken))
+                    await _dbContext.Database.BeginTransactionAsync(cancellationToken))
                 {
-                    await _next(context);
+                    await next(context);
 
                     if (context.Response.StatusCode >= 400)
                     {
@@ -47,7 +47,7 @@ namespace INuStore.API.Middlewares
                     }
                     else
                     {
-                        await dbContext.SaveChangesAsync(cancellationToken);
+                        await _dbContext.SaveChangesAsync(cancellationToken);
                         await transaction.CommitAsync(cancellationToken);
                     }
                 }

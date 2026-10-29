@@ -3,6 +3,7 @@ using INustore.UseCase.Abstractions.UnitOfWork;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.User;
 using INuStore.Domain.Entities.Identity;
+using INuStore.Domain.Exceptions;
 
 namespace INustore.UseCase.UseCases.V1.UserService
 {
@@ -23,7 +24,7 @@ namespace INustore.UseCase.UseCases.V1.UserService
 
         public async Task<Result<Response.GetUserByIdResponse>> GetUserById(Query.GetUserById request, CancellationToken cancellationToken = default)
         {
-            var user = await _unitOfWork.UserRepository.FindByIdAsync(request.UserId);
+            var user = await _unitOfWork.UserRepository.FindByIdAsync(request.UserId) ?? throw new UserException.UserNotFoundException(request.UserId);
             var userResponse = new Response.UserResponse(user.Id, user.UserName, user.Email);
             return Result.Success(new Response.GetUserByIdResponse(userResponse));
         }

@@ -17,7 +17,10 @@ builder.Logging
 
 builder.Host.UseSerilog();
 
+// Register custom middleware
+builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 builder.Services.AddScoped<TransactionMiddleware>();
+
 // Infrastructure Dependency Injection
 // Configure Options and SQL Server Retry Options
 builder.Services.ConfigureSqlServerRetryOptions(builder.Configuration.GetSection(nameof(SqlServerRetryOptions)));
@@ -35,6 +38,8 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

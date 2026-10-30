@@ -9,4 +9,7 @@
     <Project Path="src/INuStore.Infrastructure/INuStore.Infrastructure.csproj" />
     <Project Path="src/INustore.UseCase/INustore.UseCase.csproj" />
   </Folder>
+  <Folder Name="/tets/">
+    <Project Path="tests/INuStore.Tests/INuStore.Tests.csproj" Id="e41c2fd2-3044-4129-9b40-09c7f026437d" />
+  </Folder>
 </Solution>

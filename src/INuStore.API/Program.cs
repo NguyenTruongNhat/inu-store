@@ -2,6 +2,7 @@ using INustore.UseCase.DependencyInjection.Extensions;
 using INuStore.API.Middlewares;
 using INuStore.Infrastructure.DependencyInjection.Extensions;
 using INuStore.Infrastructure.DependencyInjection.Options;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,6 +36,10 @@ builder.Services.AddAppValidators();
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddApiVersioning(options =>
+{
+    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+});
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 

@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace INuStore.API.Controllers
 {
-    [ApiController]
-    public class UserController : Controller
+    [ApiVersion("1")]
+    public class UserController : ApiController
     {
         private readonly IUserService _userService;
         public UserController(IUserService userService)

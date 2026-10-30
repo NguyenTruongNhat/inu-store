@@ -24,7 +24,8 @@ namespace INustore.UseCase.UseCases.V1.UserService
 
         public async Task<Result<Response.GetUserByIdResponse>> GetUserById(Query.GetUserById request, CancellationToken cancellationToken = default)
         {
-            var user = await _unitOfWork.UserRepository.FindByIdAsync(request.UserId) ?? throw new UserException.UserNotFoundException(request.UserId);
+            var user = await _unitOfWork.UserRepository.FindByIdAsync(request.UserId, cancellationToken)
+                ?? throw new UserException.UserNotFoundException(request.UserId);
             var userResponse = new Response.UserResponse(user.Id, user.UserName, user.Email);
             return Result.Success(new Response.GetUserByIdResponse(userResponse));
         }
@@ -58,7 +59,7 @@ namespace INustore.UseCase.UseCases.V1.UserService
 
         public async Task<Result> UpdateUser(Command.UpdateUser request, CancellationToken cancellationToken = default)
         {
-            var user = await _unitOfWork.UserRepository.FindByIdAsync(request.UserId);
+            var user = await _unitOfWork.UserRepository.FindByIdAsync(request.UserId, cancellationToken);
             if (user != null)
             {
                 user.UserName = request.UserName;

@@ -1,5 +1,5 @@
 @INuStore.API_HostAddress = http://localhost:5157
-@userId = 99
+@userId = 84
 @pageIndex = 1
 @pageSize = 10
 

@@ -1,9 +1,11 @@
 ﻿using INustore.UseCase.Abstractions.Services;
 using INuStore.Contract.Service.V1.User;
+using INuStore.API.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace INuStore.API.Controllers
 {
+    [ApiController]
     public class UserController : Controller
     {
         private readonly IUserService _userService;
@@ -13,6 +15,7 @@ namespace INuStore.API.Controllers
         }
 
         [HttpGet("GetUserById")]
+        [Validate<Query.GetUserById>]
         public async Task<IActionResult> GetUserById([FromQuery] Query.GetUserById request, CancellationToken cancellationToken = default)
         {
             var response = await _userService.GetUserById(request, cancellationToken);
@@ -27,6 +30,7 @@ namespace INuStore.API.Controllers
         }
 
         [HttpPost("CreateUser")]
+        [Validate<Command.CreateUser>]
         public async Task<IActionResult> CreateUser([FromBody] Command.CreateUser request, CancellationToken cancellationToken = default)
         {
             var result = await _userService.CreateUser(request, cancellationToken);
@@ -34,6 +38,7 @@ namespace INuStore.API.Controllers
         }
 
         [HttpPut("UpdateUser")]
+        [Validate<Command.UpdateUser>]
         public async Task<IActionResult> UpdateUser([FromBody] Command.UpdateUser request, CancellationToken cancellationToken = default)
         {
             var result = await _userService.UpdateUser(request, cancellationToken);

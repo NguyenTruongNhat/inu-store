@@ -33,6 +33,7 @@ builder.Services.AddRepositoryBaseConfiguration();
 // UseCase Dependency Injection
 builder.Services.AddAppServices();
 builder.Services.AddAppValidators();
+builder.Services.AddAppMappings();
 
 // Add services to the container.
 builder.Services.AddControllers();

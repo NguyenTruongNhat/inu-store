@@ -1,5 +1,6 @@
 ﻿using INustore.UseCase.Abstractions.Services;
 using INustore.UseCase.Abstractions.UnitOfWork;
+using AutoMapper;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.User;
 using INuStore.Domain.Entities.Identity;
@@ -10,34 +11,32 @@ namespace INustore.UseCase.UseCases.V1.UserService
     public class UserService : IUserService
     {
         private readonly IUnitOfWork _unitOfWork;
-        public UserService(IUnitOfWork unitOfWork)
+        private readonly IMapper _mapper;
+
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<Result<Response.GetAllUsersResponse>> GetAllUsers(Query.GetAllUsers request, CancellationToken cancellationToken = default)
         {
             var users = _unitOfWork.UserRepository.FindAll();
-            var userResponses = users.Select(user => new Response.UserResponse(user.Id, user.UserName, user.Email)).ToList();
-            return Result.Success(new Response.GetAllUsersResponse(userResponses, userResponses.Count()));
+            var userResponses = _mapper.Map<List<Response.UserResponse>>(users);
+            return Result.Success(new Response.GetAllUsersResponse(userResponses));
         }
 
         public async Task<Result<Response.GetUserByIdResponse>> GetUserById(Query.GetUserById request, CancellationToken cancellationToken = default)
         {
             var user = await _unitOfWork.UserRepository.FindByIdAsync(request.UserId, cancellationToken)
                 ?? throw new UserException.UserNotFoundException(request.UserId);
-            var userResponse = new Response.UserResponse(user.Id, user.UserName, user.Email);
+            var userResponse = _mapper.Map<Response.UserResponse>(user);
             return Result.Success(new Response.GetUserByIdResponse(userResponse));
         }
 
         public async Task<Result> CreateUser(Command.CreateUser request, CancellationToken cancellationToken = default)
         {
-            var user = new User
-            {
-                UserName = "nhatnguyen",
-                Email = request.Email,
-                PasswordHash = request.Password
-            };
+            var user = _mapper.Map<User>(request);
             _unitOfWork.UserRepository.Add(user);
 
             var user2 = new User { UserName = "nhatnguyen2", Email = "nhatnguyen2@example.com", PasswordHash = "hashedpassword2" };

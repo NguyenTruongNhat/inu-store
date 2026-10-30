@@ -1,4 +1,5 @@
 using INustore.UseCase.DependencyInjection.Extensions;
+using INuStore.API.DependencyInjection.Extensions;
 using INuStore.API.Middlewares;
 using INuStore.Infrastructure.DependencyInjection.Extensions;
 using INuStore.Infrastructure.DependencyInjection.Options;
@@ -34,17 +35,18 @@ builder.Services.AddAppServices();
 builder.Services.AddAppValidators();
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddApiVersioning(options =>
 {
     options.ApiVersionReader = new UrlSegmentApiVersionReader();
 });
+builder.Services.AddSwagger();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+//builder.Services.AddOpenApi();
 
 var app = builder.Build();
-
+app.ConfigureSwagger();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.

@@ -1,6 +1,7 @@
 ﻿using INustore.UseCase.Abstractions.Services;
-using INuStore.Contract.Service.V1.User;
 using INuStore.API.Filters;
+using INuStore.Contract.Abstractions.Share;
+using INuStore.Contract.Service.V1.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace INuStore.API.Controllers
@@ -16,6 +17,8 @@ namespace INuStore.API.Controllers
 
         [HttpGet("GetUserById")]
         [Validate<Query.GetUserById>]
+        [ProducesResponseType(typeof(Result<Response.GetUserByIdResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetUserById([FromQuery] Query.GetUserById request, CancellationToken cancellationToken = default)
         {
             var response = await _userService.GetUserById(request, cancellationToken);

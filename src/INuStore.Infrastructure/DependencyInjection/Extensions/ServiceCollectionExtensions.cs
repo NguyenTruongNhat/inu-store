@@ -1,15 +1,29 @@
 ﻿using INustore.UseCase.Abstractions.Repositories;
+using INustore.UseCase.Abstractions.Security;
 using INustore.UseCase.Abstractions.UnitOfWork;
 using INuStore.Infrastructure.DependencyInjection.Options;
 using INuStore.Infrastructure.Repositories;
+using INuStore.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace INuStore.Infrastructure.DependencyInjection.Extensions;
+
 public static class ServiceCollectionExtensions
 {
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.ConfigureSqlServerRetryOptions(configuration.GetSection(nameof(SqlServerRetryOptions)));
+
+        services.AddSqlConfiguration();
+        services.AddRepositoryBaseConfiguration();
+        services.AddPasswordHasherConfiguration();
+
+        return services;
+    }
+
     public static void AddSqlConfiguration(this IServiceCollection services)
     {
         services.AddDbContextPool<DbContext, ApplicationDbContext>((provider, builder) =>
@@ -47,8 +61,6 @@ public static class ServiceCollectionExtensions
                             => optionsBuilder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.GetName().Name));
             #endregion\
         });
-
-
     }
 
     public static OptionsBuilder<SqlServerRetryOptions> ConfigureSqlServerRetryOptions(this IServiceCollection services, IConfigurationSection section)
@@ -66,5 +78,10 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<IUserRepository, UserRepository>();
 
+    }
+
+    public static void AddPasswordHasherConfiguration(this IServiceCollection services)
+    {
+        services.AddTransient<IPasswordHasher, BCryptPasswordHasher>();
     }
 }

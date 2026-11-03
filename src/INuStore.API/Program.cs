@@ -2,8 +2,6 @@ using INustore.UseCase.DependencyInjection.Extensions;
 using INuStore.API.DependencyInjection.Extensions;
 using INuStore.API.Middlewares;
 using INuStore.Infrastructure.DependencyInjection.Extensions;
-using INuStore.Infrastructure.DependencyInjection.Options;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,32 +17,15 @@ builder.Logging
 
 builder.Host.UseSerilog();
 
-// Register custom middleware
-builder.Services.AddTransient<ExceptionHandlingMiddleware>();
-builder.Services.AddScoped<TransactionMiddleware>();
-
 // Infrastructure Dependency Injection
-// Configure Options and SQL Server Retry Options
-builder.Services.ConfigureSqlServerRetryOptions(builder.Configuration.GetSection(nameof(SqlServerRetryOptions)));
-builder.Services.AddSqlConfiguration();
-builder.Services.AddRepositoryBaseConfiguration();
-
+builder.Services.AddInfrastructure(builder.Configuration);
 
 // UseCase Dependency Injection
-builder.Services.AddAppServices();
-builder.Services.AddAppValidators();
-builder.Services.AddAppMappings();
+builder.Services.AddUseCase();
 
-// Add services to the container.
-builder.Services.AddControllers();
-builder.Services.AddApiVersioning(options =>
-{
-    options.ApiVersionReader = new UrlSegmentApiVersionReader();
-});
-builder.Services.AddSwagger();
+// API Dependency Injection
+builder.Services.AddApi();
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-//builder.Services.AddOpenApi();
 
 var app = builder.Build();
 app.ConfigureSwagger();

@@ -8,6 +8,15 @@ namespace INustore.UseCase.DependencyInjection.Extensions
 {
     public static class ServiceCollectionExtensions
     {
+        public static IServiceCollection AddUseCase(this IServiceCollection services)
+        {
+            services.AddAppServices();
+            services.AddAppValidators();
+            services.AddAppMappings();
+
+            return services;
+        }
+
         public static IServiceCollection AddAppServices(this IServiceCollection services)
         => services.AddScoped<IUserService, UserService>();
 

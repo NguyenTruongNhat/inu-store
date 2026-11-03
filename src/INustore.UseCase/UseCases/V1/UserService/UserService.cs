@@ -1,6 +1,7 @@
-﻿using INustore.UseCase.Abstractions.Services;
+﻿using AutoMapper;
+using INustore.UseCase.Abstractions.Security;
+using INustore.UseCase.Abstractions.Services;
 using INustore.UseCase.Abstractions.UnitOfWork;
-using AutoMapper;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.User;
 using INuStore.Domain.Entities.Identity;
@@ -12,11 +13,13 @@ namespace INustore.UseCase.UseCases.V1.UserService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public UserService(IUnitOfWork unitOfWork, IMapper mapper)
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper, IPasswordHasher passwordHasher)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<Result<Response.GetAllUsersResponse>> GetAllUsers(Query.GetAllUsers request, CancellationToken cancellationToken = default)
@@ -37,10 +40,9 @@ namespace INustore.UseCase.UseCases.V1.UserService
         public async Task<Result> CreateUser(Command.CreateUser request, CancellationToken cancellationToken = default)
         {
             var user = _mapper.Map<User>(request);
-            _unitOfWork.UserRepository.Add(user);
 
-            var user2 = new User { UserName = "nhatnguyen2", Email = "nhatnguyen2@example.com", PasswordHash = "hashedpassword2" };
-            _unitOfWork.UserRepository.Add(user2);
+            user.PasswordHash = _passwordHasher.Hash(request.Password);
+            _unitOfWork.UserRepository.Add(user);
 
             return Result.Success();
         }

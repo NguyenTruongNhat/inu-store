@@ -1,6 +1,7 @@
 ﻿using INustore.UseCase.Abstractions.Repositories;
 using INustore.UseCase.Abstractions.Security;
 using INustore.UseCase.Abstractions.UnitOfWork;
+using INuStore.Infrastructure.Authentication;
 using INuStore.Infrastructure.DependencyInjection.Options;
 using INuStore.Infrastructure.Repositories;
 using INuStore.Infrastructure.Security;
@@ -82,6 +83,7 @@ public static class ServiceCollectionExtensions
 
     public static void AddPasswordHasherConfiguration(this IServiceCollection services)
     {
-        services.AddTransient<IPasswordHasher, BCryptPasswordHasher>();
+        services.AddTransient<IPasswordHasher, BCryptPasswordHasher>()
+                .AddTransient<IJwtTokenService, JwtTokenService>();
     }
 }

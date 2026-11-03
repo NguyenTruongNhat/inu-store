@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using INustore.UseCase.Abstractions.Services;
+using INustore.UseCase.UseCases.V1.AuthService;
 using INustore.UseCase.UseCases.V1.UserService;
 using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics.Contracts;
 
 namespace INustore.UseCase.DependencyInjection.Extensions
 {
@@ -18,7 +18,9 @@ namespace INustore.UseCase.DependencyInjection.Extensions
         }
 
         public static IServiceCollection AddAppServices(this IServiceCollection services)
-        => services.AddScoped<IUserService, UserService>();
+        => services.AddScoped<IUserService, UserService>()
+                   .AddTransient<IAuthService, AuthService>()
+                   ;
 
         public static IServiceCollection AddAppMappings(this IServiceCollection services)
         => services.AddAutoMapper(UseCase.AssemblyReference.Assembly);

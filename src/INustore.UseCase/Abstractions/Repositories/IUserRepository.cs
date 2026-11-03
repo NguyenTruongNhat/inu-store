@@ -4,5 +4,6 @@ namespace INustore.UseCase.Abstractions.Repositories
 {
     public interface IUserRepository : IRepositoryBase<User, int>
     {
+        Task<User?> GetUserByUserNameAsync(string userName, CancellationToken cancellationToken = default);
     }
 }

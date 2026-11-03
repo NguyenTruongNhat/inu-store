@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Docs/">
+    <File Path="Docs/where-to-register-and-inject-dependencies.MD" />
     <File Path="Docs/why-savechangeasync-need-to-await.MD" />
   </Folder>
   <Folder Name="/Solution Items/">

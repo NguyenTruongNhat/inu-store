@@ -16,6 +16,8 @@ namespace INuStore.API.Controllers
             _userService = userService;
         }
 
+
+        [Authorize(Policy = "allow-gmail")]
         [HttpGet("GetUserById")]
         [Validate<Query.GetUserById>]
         [ProducesResponseType(typeof(Result<Response.GetUserByIdResponse>), StatusCodes.Status200OK)]

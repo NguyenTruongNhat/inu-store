@@ -20,6 +20,7 @@ namespace INuStore.API.DependencyInjection.Extensions
             services.AddSwagger();
 
             services.AddJwtAuthenticationApi(configuration);
+            services.AddAuthorizationApi();
 
             return services;
         }

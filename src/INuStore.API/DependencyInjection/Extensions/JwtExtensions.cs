@@ -59,4 +59,27 @@ public static class JwtExtensions
         });
 
     }
+
+
+    public static void AddAuthorizationApi(this IServiceCollection services)
+    {
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("allow-gmail", policy =>
+            {
+                policy.RequireAuthenticatedUser()
+                      //.RequireRole("Admin", "User")
+                      //.RequireClaim("email", "gmail.com")
+                      .RequireAssertion(context =>
+                      {
+                          var emailClaim = context.User.FindFirst(c => c.Type == "email");
+                          return emailClaim != null && emailClaim.Value.EndsWith("@gmail.com");
+                      })
+                ;
+            });
+        });
+    }
+
+
+
 }

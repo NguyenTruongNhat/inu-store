@@ -1,6 +1,7 @@
 ﻿using INustore.UseCase.Abstractions.Security;
 using INustore.UseCase.Abstractions.Services;
 using INustore.UseCase.Abstractions.UnitOfWork;
+using INustore.UseCase.Exceptions;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.Auth;
 using INuStore.Domain.Entities.Identity;
@@ -31,12 +32,12 @@ namespace INustore.UseCase.UseCases.V1.AuthService
             var user = await _unitOfWork.UserRepository.GetUserByUserNameAsync(request.UserName, cancellationToken);
             if (user is null)
             {
-                throw new Exception("User not found");
+                throw new InvalidCredentialsException();
             }
             var isPasswordValid = _passwordHasher.Verify(request.Password, user.PasswordHash);
             if (!isPasswordValid)
             {
-                throw new Exception("Invalid password");
+                throw new InvalidCredentialsException();
             }
             List<Claim> claims = BuildClaim(user);
 

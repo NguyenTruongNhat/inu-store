@@ -48,6 +48,7 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
     private static int GetStatusCode(Exception exception) =>
         exception switch
         {
+            InvalidCredentialsException => StatusCodes.Status401Unauthorized,
             BadRequestException => StatusCodes.Status400BadRequest,
             NotFoundException => StatusCodes.Status404NotFound,
             //Application.Exceptions.ValidationException => StatusCodes.Status422UnprocessableEntity,

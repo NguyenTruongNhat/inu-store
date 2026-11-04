@@ -24,4 +24,8 @@
     <ProjectReference Include="..\INustore.UseCase\INustore.UseCase.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="INuStore.Tests" />
+  </ItemGroup>
+
 </Project>

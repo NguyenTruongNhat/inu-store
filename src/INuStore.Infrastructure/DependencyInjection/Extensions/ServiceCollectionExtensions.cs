@@ -55,7 +55,7 @@ public static class ServiceCollectionExtensions
             builder
             .EnableDetailedErrors(true)
             .EnableSensitiveDataLogging(true)
-            .UseLazyLoadingProxies(true)
+            .UseLazyLoadingProxies(false)
             .UseSqlServer(
                 connectionString: configuration.GetConnectionString("ConnectionStrings"),
                 sqlServerOptionsAction: optionsBuilder

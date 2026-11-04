@@ -1,0 +1,6 @@
+<Project>
+  <ItemGroup>
+    <!-- Temporary exception for EF migration tooling; remove after upgrading AutoMapper. -->
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-rvv3-g6hj-g44x" />
+  </ItemGroup>
+</Project>

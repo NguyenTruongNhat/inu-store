@@ -4,4 +4,6 @@ internal static class TableNames
 {
     // *********** Singular Nouns ***********
     internal const string Users = nameof(Users);
+    internal const string Roles = nameof(Roles);
+    internal const string UserRoles = nameof(UserRoles);
 }

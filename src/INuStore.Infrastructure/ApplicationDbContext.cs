@@ -12,5 +12,9 @@ public sealed class ApplicationDbContext : DbContext
         => builder.ApplyConfigurationsFromAssembly(AssemblyReference.Assembly);
 
     public DbSet<User> Users { get; set; }
+    public DbSet<Role> Roles { get; set; }
+    public DbSet<UserRole> UserRoles { get; set; }
+
+
 
 }

@@ -2,6 +2,7 @@
 using INuStore.API.Filters;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace INuStore.API.Controllers
@@ -25,6 +26,7 @@ namespace INuStore.API.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers([FromQuery] Query.GetAllUsers request, CancellationToken cancellationToken = default)
         {

@@ -42,6 +42,7 @@ Use the existing DI extension methods. `AddAppServices` explicitly registers `IU
 
 Recheck these existing behaviors when relevant to the requested work, and update this section when they change:
 
+- Swagger declares a shared HTTP Bearer security scheme and requirement. Use `Authorize` with the raw access token; Swagger adds the `Bearer` prefix. Actual endpoint access still follows the existing `[Authorize]` attributes.
 - `LoginAsync` throws the UseCase `InvalidCredentialsException` for either a missing user or an invalid password. Both return HTTP 401 with title `Authentication Failure` and detail `Invalid username or password.`; no token is generated on either failure.
 - `CreateUser` also adds a hard-coded second user. `UserProfile` copies `Password` directly into `PasswordHash`; hashing is not implemented. Never expose passwords or hashes in response DTOs.
 - `GetAllUsers` ignores `PageIndex` and `PageSize` and maps the entire query to a list. The existence of `PagedResult<T>` does not mean this endpoint paginates.
@@ -89,7 +90,7 @@ Use four-space indentation, braces on separate lines, and the surrounding file's
 
 For a feature, update the versioned contracts, service interface/implementation, validators, mappings, controller, and DI registrations as needed. Put persistence/model changes in Infrastructure and Domain as appropriate. Keep edits focused and preserve unrelated user work.
 
-The existing suite contains four architecture tests, three `AuthService` login tests, and one exception-middleware test. The behavior tests use mocks and an in-memory HTTP context; they do not verify API startup, SQL Server, or transaction behavior. Add xUnit `[Fact]` behavior tests for service/API changes and architecture tests for new boundaries. Check success, invalid input, missing records, and persistence/failure behavior relevant to the change. No coverage percentage is enforced. Documentation-only edits need content/path checks rather than new behavior tests.
+The existing suite contains four architecture tests, three `AuthService` login tests, one exception-middleware test, and one Swagger Bearer configuration test. The behavior tests use mocks and an in-memory HTTP context; they do not verify API startup, SQL Server, or transaction behavior. Add xUnit `[Fact]` behavior tests for service/API changes and architecture tests for new boundaries. Check success, invalid input, missing records, and persistence/failure behavior relevant to the change. No coverage percentage is enforced. Documentation-only edits need content/path checks rather than new behavior tests.
 
 Build before using `--no-build` tests. Report commands run, warnings/failures, and any checks blocked by the environment. Compilation and architecture tests do not establish working API startup or SQL Server behavior. Do not suppress dependency/security warnings to make validation look clean.
 

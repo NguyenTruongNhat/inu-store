@@ -24,7 +24,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddUseCase();
 
 // API Dependency Injection
-builder.Services.AddApi();
+builder.Services.AddApi(builder.Configuration);
 
 
 var app = builder.Build();

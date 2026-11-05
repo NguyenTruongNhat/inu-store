@@ -1,0 +1,15 @@
+interface:
+  display_name: "Technical Docs"
+  short_description: "Viết tài liệu kỹ thuật tiếng Việt theo 5W1H"
+  default_prompt: "Dùng $technical-docs để viết tài liệu tiếng Việt về chủ đề tôi yêu cầu, dựa trên source hiện tại và Microsoft Learn MCP."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "microsoft-learn"
+      description: "Official Microsoft Learn documentation and code examples"
+      transport: "streamable_http"
+      url: "https://learn.microsoft.com/api/mcp"
+
+policy:
+  allow_implicit_invocation: true

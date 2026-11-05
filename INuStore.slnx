@@ -7,6 +7,15 @@
   <Folder Name="/.agents/skills/dotnet-webapi/">
     <File Path=".agents/skills/dotnet-webapi/SKILL.md" />
   </Folder>
+  <Folder Name="/.agents/skills/technical-docs/">
+    <File Path=".agents/skills/technical-docs/SKILL.md" />
+  </Folder>
+  <Folder Name="/.agents/skills/technical-docs/agents/">
+    <File Path=".agents/skills/technical-docs/agents/openai.yaml" />
+  </Folder>
+  <Folder Name="/.agents/skills/technical-docs/references/">
+    <File Path=".agents/skills/technical-docs/references/document-template.md" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path="AGENTS.md" />
     <File Path="Directory.Build.props" />

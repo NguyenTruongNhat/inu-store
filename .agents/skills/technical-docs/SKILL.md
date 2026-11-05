@@ -7,6 +7,14 @@ description: Write or update Vietnamese technical documentation for freshers in 
 
 Viết để fresher hiểu vấn đề, đọc được code và biết cách áp dụng trong project. Mặc định lưu tài liệu trong `technical-docs/` ở repository root; ưu tiên đường dẫn/phạm vi khác nếu người dùng chỉ định.
 
+## Phong cách và độ dài
+
+- Viết ngắn gọn, dễ hiểu cho fresher: mỗi đoạn tập trung một ý, giải thích thuật ngữ khi xuất hiện lần đầu. Giữ phần cơ chế và ví dụ cần thiết; bỏ câu dẫn, ý lặp và chi tiết không giúp hiểu chủ đề.
+- Đi thẳng vào nội dung; bỏ câu dẫn như “Các đường dẫn dưới đây tính từ repository root”. Chỉ liệt kê file/symbol cần đọc, không mặc định lập bảng mọi file liên quan.
+- Chỉ phân tích sâu khi đó là chủ đề chính hoặc người dùng yêu cầu; vẫn giữ điều kiện quan trọng để không làm sai nghĩa.
+- Sơ đồ chỉ thể hiện luồng chính và nhánh lỗi cần hiểu. Không đưa mọi nhánh vận hành vào một sơ đồ.
+- Không mặc định thêm mục “Cách kiểm tra và những hiểu nhầm cần tránh”, checklist test dài hoặc báo cáo quá trình viết trong bài. Lồng lưu ý quan trọng vào phần liên quan; báo phạm vi kiểm tra ngắn trong lời bàn giao.
+
 ## Phạm vi và căn cứ
 
 - Chỉ tạo/lưu/sửa file tài liệu khi yêu cầu có ý định đó. Một câu hỏi giải thích, kể cả khi gọi skill, không tự cho phép lưu file.
@@ -57,6 +65,13 @@ Bao quát 5W1H: What, Why, Who, When, Where, How. Có thể lồng các câu tr�
 - Không mặc định công nghệ mới hơn luôn tốt hơn. Đưa ra khuyến nghị cho bối cảnh project và điều kiện nên chọn phương án khác.
 - Khi nói về phiên bản, bảo mật hoặc khuyến nghị có thể thay đổi, tra cứu nguồn hiện tại. Không khẳng định thị phần, “production luôn dùng/phổ biến nhất”, số query cố định hoặc số liệu hiệu năng nếu chưa có nguồn/phép đo và giả định phù hợp.
 - Nêu trade-off và căn cứ; nếu là đề xuất chưa được benchmark trong project thì nói rõ.
+- Khi tạo bài mới hoặc viết lại toàn bài, có phần **Best practices cho production** ngắn, dễ tìm: ưu tiên các khuyến nghị liên quan trực tiếp, giải thích ngắn vấn đề và cách xử lý. Phân biệt việc code đã làm với đề xuất chưa áp dụng; không biến phần này thành checklist chung cho mọi hệ thống.
+
+## Câu hỏi phỏng vấn
+
+- Khi tạo bài mới hoặc viết lại toàn bài, kết thúc bằng **5–7 câu hỏi phỏng vấn senior** liên quan trực tiếp đến chủ đề, mặc định 6 câu. Yêu cầu khác của người dùng được ưu tiên.
+- Dùng danh sách đánh số; hỏi về quyết định thiết kế, trade-off, tình huống lỗi và vận hành thực tế thay vì chỉ hỏi định nghĩa. Câu hỏi rõ, gọn; không gộp quá nhiều ý không liên quan vào một câu.
+- Không tự thêm đáp án dài nếu người dùng chưa yêu cầu. Với cập nhật nhỏ, giữ phạm vi yêu cầu, không tự mở rộng bài chỉ để bổ sung mục này.
 
 ## Kiểm tra và bàn giao
 

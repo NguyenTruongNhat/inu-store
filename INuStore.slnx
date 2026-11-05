@@ -28,6 +28,7 @@
     <File Path="technical-docs/3.where-to-register-and-inject-dependencies.MD" />
     <File Path="technical-docs/4.ef-core-loading.MD" />
     <File Path="technical-docs/5.ef-core-migrations.MD" />
+    <File Path="technical-docs/6.exception-handling-middleware.MD" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/INuStore.API/INuStore.API.csproj" />

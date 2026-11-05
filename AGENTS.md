@@ -16,6 +16,12 @@ This guide applies to the whole repository. INuStore is a .NET 10 ASP.NET Core A
 | `tests/INuStore.Tests/` | xUnit login/middleware behavior tests and NetArchTest architecture tests. The solution folder is misspelled `/tets/`; the disk path is `tests/`. |
 | `Docs/` | Vietnamese technical notes. `custom-middleware.MD` is currently empty. |
 
+## Project MCP
+
+The project-local `.codex/config.toml` configures `microsoft-learn` at `https://learn.microsoft.com/api/mcp`. Use this server for official C#, .NET, ASP.NET Core, and EF Core documentation when available.
+
+Commit this configuration with the repository. After cloning, trust the project in Codex and reopen the client to load the MCP configuration. Run `codex mcp list` from the repository root to check the configured server.
+
 ## Architecture and Dependency Injection
 
 Keep these solution-layer boundaries, enforced by `ArchitectureTests.cs`:

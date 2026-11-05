@@ -1,9 +1,24 @@
 <Solution>
+  <Folder Name="/.agents/" />
+  <Folder Name="/.agents/skills/" />
+  <Folder Name="/.agents/skills/dotnet-best-practices/">
+    <File Path=".agents/skills/dotnet-best-practices/SKILL.md" />
+  </Folder>
+  <Folder Name="/.agents/skills/dotnet-webapi/">
+    <File Path=".agents/skills/dotnet-webapi/SKILL.md" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path="AGENTS.md" />
     <File Path="Directory.Build.props" />
-    <File Path="Docs/4.ef-core-loading.MD" />
-    <File Path="Docs/5.ef-core-migrations.MD" />
+    <File Path="skills-lock.json" />
+  </Folder>
+  <Folder Name="/Solution Items/technical-docs/">
+    <File Path="technical-docs/0.custom-middleware.MD" />
+    <File Path="technical-docs/1.why-savechangeasync-need-to-await.MD" />
+    <File Path="technical-docs/2.fluent-validation-flow.MD" />
+    <File Path="technical-docs/3.where-to-register-and-inject-dependencies.MD" />
+    <File Path="technical-docs/4.ef-core-loading.MD" />
+    <File Path="technical-docs/5.ef-core-migrations.MD" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/INuStore.API/INuStore.API.csproj" />

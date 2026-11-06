@@ -37,32 +37,31 @@ Mỗi mục có mã dạng `1.1` (phase 1, mục 1). Đổi `[ ]` thành `[x]` k
 
 Mục tiêu: Thiết lập nền tảng chuẩn cho dự án.
 
-- [ ] **1.1** Khởi tạo ASP.NET Core Web API.
-- [ ] **1.2** Thiết kế Clean Architecture và phân chia các layer.
-- [ ] **1.3** Cấu hình Dependency Injection.
-- [ ] **1.4** Thiết lập EF Core và SQL Server.
-- [ ] **1.5** Quản lý database migration.
-- [ ] **1.6** Xây dựng Global Exception Handling.
-- [ ] **1.7** Chuẩn hóa API Response và Problem Details.
-- [ ] **1.8** Tích hợp FluentValidation.
-- [ ] **1.9** Tổ chức Application Service theo từng nhóm nghiệp vụ; Controller gọi Service trực tiếp.
-- [ ] **1.10** Tích hợp validation bằng action filter; logging và đo thời gian xử lý request bằng middleware.
-- [ ] **1.11** Cấu hình Options Pattern và environment settings.
-- [ ] **1.12** Tích hợp Swagger/OpenAPI.
-- [ ] **1.13** Xây dựng Health Check endpoint.
+- [x] **1.1** Khởi tạo ASP.NET Core Web API.
+- [x] **1.2** Thiết kế Clean Architecture và phân chia các layer.
+- [x] **1.3** Cấu hình Dependency Injection.
+- [x] **1.4** Thiết lập EF Core và SQL Server.
+- [x] **1.5** Quản lý database migration.
+- [x] **1.6** Xây dựng Global Exception Handling.
+- [x] **1.7** Chuẩn hóa API Response và Problem Details.
+- [x] **1.8** Tích hợp FluentValidation.
+- [x] **1.9** Tổ chức Application Service theo từng nhóm nghiệp vụ; Controller gọi Service trực tiếp.
+- [x] **1.10** Tích hợp validation bằng action filter.
+- [ ] **1.11** Logging và đo thời gian xử lý request bằng middleware.
+- [x] **1.12** Cấu hình Options Pattern và environment settings.
+- [x] **1.13** Tích hợp Swagger/OpenAPI.
+- [ ] **1.14** Xây dựng Health Check endpoint.
 
 ### Phase 02 — User Management
 
 Mục tiêu: Ôn tập CRUD, Entity Relationships, LINQ và EF Core.
 
-- [ ] **2.1** Tạo tài khoản người dùng.
-- [ ] **2.2** Cập nhật thông tin người dùng.
-- [ ] **2.3** Xem chi tiết người dùng.
-- [ ] **2.4** Lấy danh sách người dùng.
+- [x] **2.1** Tạo tài khoản người dùng.
+- [x] **2.2** Cập nhật thông tin người dùng.
+- [x] **2.3** Xem chi tiết người dùng.
+- [x] **2.4** Lấy danh sách người dùng.
 - [ ] **2.5** Phân trang, tìm kiếm, lọc và sắp xếp.
 - [ ] **2.7** Soft Delete và khôi phục tài khoản.
-- [ ] **2.8** Quản lý trạng thái tài khoản.
-- [ ] **2.9** Quản lý hồ sơ cá nhân.
 - [ ] **2.10** Kiểm tra trùng email và username.
 - [ ] **2.11** Áp dụng optimistic concurrency khi cập nhật.
 - [ ] **2.12** Ghi nhận CreatedAt, UpdatedAt, CreatedBy, UpdatedBy.
@@ -78,10 +77,6 @@ Mục tiêu: Xây dựng hệ thống xác thực an toàn.
 - [ ] **3.5** Refresh Token.
 - [ ] **3.6** Refresh Token Rotation.
 - [ ] **3.7** Đăng xuất khỏi thiết bị hiện tại.
-- [ ] **3.8** Đăng xuất khỏi tất cả thiết bị.
-- [ ] **3.9** Quản lý phiên đăng nhập và thiết bị.
-- [ ] **3.10** Quên mật khẩu và đặt lại mật khẩu.
-- [ ] **3.11** Đổi mật khẩu.
 - [ ] **3.14** Multi-Factor Authentication bằng TOTP.
 - [ ] **3.15** Recovery Codes cho MFA.
 - [ ] **3.16** Thu hồi token hoặc session khi có sự kiện bảo mật.

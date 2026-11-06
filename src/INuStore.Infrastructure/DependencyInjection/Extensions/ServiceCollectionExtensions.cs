@@ -1,6 +1,8 @@
 ﻿using INustore.UseCase.Abstractions.Repositories;
 using INustore.UseCase.Abstractions.Security;
 using INustore.UseCase.Abstractions.UnitOfWork;
+using INuStore.Domain.Entities.Identity;
+using INuStore.Domain.Enums;
 using INuStore.Infrastructure.Authentication;
 using INuStore.Infrastructure.DependencyInjection.Options;
 using INuStore.Infrastructure.Repositories;
@@ -60,6 +62,24 @@ public static class ServiceCollectionExtensions
                 connectionString: configuration.GetConnectionString("ConnectionStrings"),
                 sqlServerOptionsAction: optionsBuilder
                             => optionsBuilder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.GetName().Name));
+
+
+            builder.UseSeeding((context, _) =>
+            {
+                foreach (var roleType in RoleType.List)
+                {
+                    if (!context.Set<Role>().Any(x => x.Name == roleType.Name))
+                    {
+                        context.Set<Role>().Add(new Role
+                        {
+                            Name = roleType.Name,
+                            Description = roleType.Description
+                        });
+                    }
+                }
+
+                context.SaveChanges();
+            });
             #endregion\
         });
     }
@@ -86,4 +106,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IPasswordHasher, BCryptPasswordHasher>()
                 .AddTransient<IJwtTokenService, JwtTokenService>();
     }
+
+
 }

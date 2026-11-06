@@ -23,6 +23,7 @@
   </Folder>
   <Folder Name="/Solution Items/requirement/">
     <File Path="requirement/overview.md" />
+    <File Path="requirement/requirement-advand.md" />
   </Folder>
   <Folder Name="/Solution Items/technical-docs/">
     <File Path="technical-docs/0.custom-middleware.MD" />

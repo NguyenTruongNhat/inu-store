@@ -21,6 +21,9 @@
     <File Path="Directory.Build.props" />
     <File Path="skills-lock.json" />
   </Folder>
+  <Folder Name="/Solution Items/requirement/">
+    <File Path="requirement/overview.md" />
+  </Folder>
   <Folder Name="/Solution Items/technical-docs/">
     <File Path="technical-docs/0.custom-middleware.MD" />
     <File Path="technical-docs/1.why-savechangeasync-need-to-await.MD" />

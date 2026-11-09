@@ -45,5 +45,6 @@ app.UseAuthorization();
 app.UseMiddleware<TransactionMiddleware>();
 
 app.MapControllers();
+app.MapAppHealthChecks();
 
 app.Run();

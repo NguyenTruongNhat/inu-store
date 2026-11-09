@@ -48,6 +48,7 @@ Use the existing DI extension methods. `AddAppServices` explicitly registers `IU
 
 Recheck these existing behaviors when relevant to the requested work, and update this section when they change:
 
+- Operational probes are anonymous and unversioned: `/health/live` only checks that the API responds, while `/health/ready` checks SQL Server connectivity through the existing EF Core context. The `sqlserver` check has the `ready` tag and a five-second registration timeout. Responses use the framework's non-cacheable plaintext output: `200 Healthy` or `503 Unhealthy`. Readiness does not validate the schema or run migrations/seeding.
 - Swagger declares a shared HTTP Bearer security scheme and requirement. Use `Authorize` with the raw access token; Swagger adds the `Bearer` prefix. Actual endpoint access still follows the existing `[Authorize]` attributes.
 - `LoginAsync` throws the UseCase `InvalidCredentialsException` for either a missing user or an invalid password. Both return HTTP 401 with title `Authentication Failure` and detail `Invalid username or password.`; no token is generated on either failure.
 - `CreateUser` also adds a hard-coded second user. `UserProfile` copies `Password` directly into `PasswordHash`; hashing is not implemented. Never expose passwords or hashes in response DTOs.
@@ -68,7 +69,7 @@ dotnet test INuStore.slnx --no-build
 dotnet run --project src/INuStore.API --launch-profile https
 ```
 
-The HTTPS profile declares `https://localhost:7005` and `http://localhost:5157`; both launch profiles use Development. Swagger is configured at `/swagger/index.html`, and `/` redirects there. Coverage is optional:
+The HTTPS profile declares `https://localhost:7005` and `http://localhost:6000`; both launch profiles use Development. The `.http` examples use the HTTPS address. Swagger is configured at `/swagger/index.html`, and `/` redirects there. Coverage is optional:
 
 ```powershell
 dotnet test tests/INuStore.Tests --collect:"XPlat Code Coverage"
@@ -96,7 +97,9 @@ Use four-space indentation, braces on separate lines, and the surrounding file's
 
 For a feature, update the versioned contracts, service interface/implementation, validators, mappings, controller, and DI registrations as needed. Put persistence/model changes in Infrastructure and Domain as appropriate. Keep edits focused and preserve unrelated user work.
 
-The existing suite contains four architecture tests, three `AuthService` login tests, one exception-middleware test, and one Swagger Bearer configuration test. The behavior tests use mocks and an in-memory HTTP context; they do not verify API startup, SQL Server, or transaction behavior. Add xUnit `[Fact]` behavior tests for service/API changes and architecture tests for new boundaries. Check success, invalid input, missing records, and persistence/failure behavior relevant to the change. No coverage percentage is enforced. Documentation-only edits need content/path checks rather than new behavior tests.
+Do not write new tests or modify/delete existing test files unless the user explicitly requests test changes. Keep all existing test files as they are. Validate implementation changes with an appropriate build and, when relevant, run the existing test suite without changing it. Documentation-only edits need content/path checks rather than builds or tests.
+
+The existing suite contains four architecture tests, three `AuthService` login tests, one exception-middleware test, and three health-endpoint tests. The behavior tests use mocks, an in-memory HTTP context, or TestServer with fake health checks; they do not verify full API startup, real SQL Server connectivity, or transaction behavior. The health tests cover healthy/unhealthy readiness and liveness independent of the database, with a fallback authorization policy to verify anonymous access. No coverage percentage is enforced.
 
 Build before using `--no-build` tests. Report commands run, warnings/failures, and any checks blocked by the environment. Compilation and architecture tests do not establish working API startup or SQL Server behavior. Do not suppress dependency/security warnings to make validation look clean.
 

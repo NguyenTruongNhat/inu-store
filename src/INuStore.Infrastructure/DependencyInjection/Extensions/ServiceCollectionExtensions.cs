@@ -10,6 +10,7 @@ using INuStore.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 
 namespace INuStore.Infrastructure.DependencyInjection.Extensions;
@@ -21,6 +22,7 @@ public static class ServiceCollectionExtensions
         services.ConfigureSqlServerRetryOptions(configuration.GetSection(nameof(SqlServerRetryOptions)));
 
         services.AddSqlConfiguration();
+        services.AddHealthCheckConfiguration();
         services.AddRepositoryBaseConfiguration();
         services.AddPasswordHasherConfiguration();
 
@@ -81,6 +83,23 @@ public static class ServiceCollectionExtensions
                 context.SaveChanges();
             });
             #endregion\
+        });
+    }
+
+    /// <summary>Registers the SQL Server connectivity health check.</summary>
+    /// <param name="services">The application's service collection.</param>
+    public static void AddHealthCheckConfiguration(this IServiceCollection services)
+    {
+        services.AddHealthChecks()
+            .AddDbContextCheck<DbContext>(
+                name: "sqlserver",
+                failureStatus: HealthStatus.Unhealthy,
+                tags: ["ready"]);
+
+        services.PostConfigure<HealthCheckServiceOptions>(options =>
+        {
+            options.Registrations.Single(registration => registration.Name == "sqlserver")
+                .Timeout = TimeSpan.FromSeconds(5);
         });
     }
 

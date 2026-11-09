@@ -70,5 +70,62 @@ namespace INustore.UseCase.UseCases.V1.UserService
 
             return Result.Success();
         }
+
+        public async Task<Result<Response.GetUserRolesResponse>> GetUserRoles(int userId, CancellationToken cancellationToken = default)
+        {
+            var user = await GetUserWithRoleAsync(userId, cancellationToken);
+            var roles = user.UserRoles.OrderBy(ur => ur.Role.Name).Select(
+                userRole => new Response.UserRoleResponse(
+                    userRole.Role.Id,
+                    userRole.Role.Name,
+                    userRole.Role.Description))
+                .ToList();
+            return Result.Success(new Response.GetUserRolesResponse(user.Id, roles));
+        }
+
+        public async Task<Result> AssignRoleToUser(Command.AssignRoleToUser request, CancellationToken cancellationToken = default)
+        {
+            var user = await GetUserWithRoleAsync(request.UserId, cancellationToken);
+
+            var role = await _unitOfWork.RoleRepository.FindByIdAsync(request.RoleId, cancellationToken)
+                                ?? throw new RoleException.RoleNotFoundException(request.RoleId);
+
+            var alreadyAssigned = user.UserRoles.Any(userRole => userRole.RoleId == role.Id);
+
+            if (alreadyAssigned)
+            {
+                return Result.Success();
+            }
+
+            var assignment = new UserRole
+            {
+                UserId = user.Id,
+                RoleId = role.Id
+            };
+
+            _unitOfWork.UserRepository.AddUserRole(assignment);
+
+            return Result.Success();
+        }
+
+        public async Task<Result> RemoveRoleFromUser(Command.RemoveRoleFromUser request, CancellationToken cancellationToken = default)
+        {
+            var user = await GetUserWithRoleAsync(request.UserId, cancellationToken);
+            var role = await _unitOfWork.RoleRepository.FindByIdAsync(request.RoleId, cancellationToken) 
+                        ?? throw new RoleException.RoleNotFoundException(request.RoleId);
+            var assignedRole = user.UserRoles.FirstOrDefault(ur => ur.RoleId == request.RoleId);
+            if (assignedRole == null)
+            {
+                return Result.Success(); // Role is not assigned to the user, nothing to remove
+            }
+            _unitOfWork.UserRepository.RemoveUserRole(assignedRole);
+            return Result.Success();
+        }
+
+        private async Task<User> GetUserWithRoleAsync(int userId, CancellationToken cancellationToken = default)
+        {
+            return await _unitOfWork.UserRepository.GetUserWithRolesAsync(userId, cancellationToken) ?? throw new UserException.UserNotFoundException(userId);
+        }
     }
 }
+

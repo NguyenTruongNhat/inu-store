@@ -10,6 +10,9 @@ namespace INustore.UseCase.Abstractions.Services
         public Task<Result> CreateUser(Command.CreateUser request, CancellationToken cancellationToken = default);
         public Task<Result> UpdateUser(Command.UpdateUser request, CancellationToken cancellationToken = default);
         public Task<Result> DeleteUser(Command.DeleteUser request, CancellationToken cancellationToken = default);
+        public Task<Result<Response.GetUserRolesResponse>> GetUserRoles(int userId, CancellationToken cancellationToken = default);
+        public Task<Result> AssignRoleToUser(Command.AssignRoleToUser request, CancellationToken cancellationToken = default);
+        public Task<Result> RemoveRoleFromUser(Command.RemoveRoleFromUser request, CancellationToken cancellationToken = default);
 
     }
 }

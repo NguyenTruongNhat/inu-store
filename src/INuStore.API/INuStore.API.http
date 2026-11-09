@@ -50,6 +50,35 @@ Content-Type: application/json
   "userId": "{{userId}}"
 }
 
+### Get roles assigned to a user
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/{{userId}}/roles
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+### Assign a role (repeat to verify success without a duplicate assignment)
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/{{userId}}/roles/{{roleId}}
+Authorization: Bearer {{accessToken}}
+
+### Remove a role assignment (repeat to verify success when already removed)
+DELETE {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/{{userId}}/roles/{{roleId}}
+Authorization: Bearer {{accessToken}}
+
+### Invalid assignment user ID: HTTP 400 when SQL Server is available
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/0/roles/{{roleId}}
+Authorization: Bearer {{accessToken}}
+
+### Invalid assignment role ID: HTTP 400 when SQL Server is available
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/{{userId}}/roles/-1
+Authorization: Bearer {{accessToken}}
+
+### Invalid removal user ID: HTTP 400 when SQL Server is available
+DELETE {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/-1/roles/{{roleId}}
+Authorization: Bearer {{accessToken}}
+
+### Invalid removal role ID: HTTP 400 when SQL Server is available
+DELETE {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/{{userId}}/roles/0
+Authorization: Bearer {{accessToken}}
+
 ### Get all roles (log in and set accessToken above)
 GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/GetAllRoles
 Authorization: Bearer {{accessToken}}

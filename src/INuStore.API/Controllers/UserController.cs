@@ -4,6 +4,7 @@ using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace INuStore.API.Controllers
 {
@@ -56,6 +57,50 @@ namespace INuStore.API.Controllers
         public async Task<IActionResult> DeleteUser([FromBody] Command.DeleteUser request, CancellationToken cancellationToken = default)
         {
             var result = await _userService.DeleteUser(request, cancellationToken);
+            return Ok(result);
+        }
+
+
+        [Authorize]
+        [HttpGet("{userId:int}/roles")]
+        [ProducesResponseType(typeof(Result<Response.GetUserRolesResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetUserRoles([FromRoute, Range(1, int.MaxValue)] int userId, CancellationToken cancellationToken = default)
+        {
+            var result = await _userService.GetUserRoles(userId, cancellationToken);
+
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpPut("{userId:int}/roles/{roleId:int}")]
+        [Validate<Command.AssignRoleToUser>]
+        [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> AssignRoleToUser(
+            [FromRoute] Command.AssignRoleToUser request,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _userService.AssignRoleToUser(request, cancellationToken);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpDelete("{userId:int}/roles/{roleId:int}")]
+        [Validate<Command.RemoveRoleFromUser>]
+        [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> RemoveRoleFromUser(
+            [FromRoute] Command.RemoveRoleFromUser request,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _userService.RemoveRoleFromUser(request, cancellationToken);
             return Ok(result);
         }
     }

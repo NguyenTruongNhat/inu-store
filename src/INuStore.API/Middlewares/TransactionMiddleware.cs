@@ -1,14 +1,18 @@
 ﻿using INuStore.Infrastructure;
 
+using INustore.UseCase.Abstractions.UnitOfWork;
+
 namespace INuStore.API.Middlewares
 {
     public sealed class TransactionMiddleware : IMiddleware
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public TransactionMiddleware(ApplicationDbContext dbContext)
+        public TransactionMiddleware(ApplicationDbContext dbContext, IUnitOfWork unitOfWork)
         {
             _dbContext = dbContext;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task InvokeAsync(
@@ -47,7 +51,7 @@ namespace INuStore.API.Middlewares
                     }
                     else
                     {
-                        await _dbContext.SaveChangesAsync(cancellationToken);
+                        await _unitOfWork.SaveChangesAsync(cancellationToken);
                         await transaction.CommitAsync(cancellationToken);
                     }
                 }

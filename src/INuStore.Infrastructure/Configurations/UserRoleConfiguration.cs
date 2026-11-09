@@ -19,7 +19,8 @@ namespace INuStore.Infrastructure.Configurations
 
             builder.HasOne(x => x.Role)
                 .WithMany(x => x.UserRoles)
-                .HasForeignKey(x => x.RoleId);
+                .HasForeignKey(x => x.RoleId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

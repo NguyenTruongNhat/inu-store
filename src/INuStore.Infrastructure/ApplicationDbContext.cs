@@ -15,6 +15,4 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<Role> Roles { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
 
-
-
 }

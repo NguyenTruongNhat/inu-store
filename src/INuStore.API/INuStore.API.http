@@ -3,6 +3,8 @@
 @userId = 8
 @pageIndex = 1
 @pageSize = 10
+@accessToken = replace-with-access-token
+@roleId = 6
 
 ### Liveness: API is responding without checking SQL Server
 GET {{INuStore.API_HostAddress}}/health/live
@@ -47,3 +49,54 @@ Content-Type: application/json
 {
   "userId": "{{userId}}"
 }
+
+### Get all roles (log in and set accessToken above)
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/GetAllRoles
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+### Get a role by ID (set roleId to an existing custom role)
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/GetRoleById?RoleId={{roleId}}
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+### Create a custom role (repeat to verify HTTP 400 for a duplicate name)
+POST {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/CreateRole
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Support",
+  "description": "Handles customer support requests."
+}
+
+### Update a custom role
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/UpdateRole
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "roleId": {{roleId}},
+  "name": "CustomerSupport",
+  "description": "Handles customer support and order questions."
+}
+
+### Delete an unassigned custom role
+DELETE {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/DeleteRole
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "roleId": {{roleId}}
+}
+
+### Missing role: HTTP 404
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/GetRoleById?RoleId=2147483647
+Authorization: Bearer {{accessToken}}
+
+### Invalid role ID: HTTP 400
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/GetRoleById?RoleId=0
+Authorization: Bearer {{accessToken}}
+
+### Missing access token: HTTP 401
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/GetAllRoles

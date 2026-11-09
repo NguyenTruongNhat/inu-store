@@ -117,6 +117,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient(typeof(IRepositoryBase<,>), typeof(RepositoryBase<,>));
 
         services.AddTransient<IUserRepository, UserRepository>();
+        services.AddTransient<IRoleRepository, RoleRepository>();
 
     }
 

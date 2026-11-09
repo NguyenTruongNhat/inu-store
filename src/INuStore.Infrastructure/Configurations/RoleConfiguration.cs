@@ -13,6 +13,9 @@ namespace INuStore.Infrastructure.Configurations
 
             builder.HasKey(x => x.Id);
 
+            builder.HasIndex(x => x.Name)
+                .IsUnique();
+
             builder.Property(x => x.Name)
                 .IsRequired()
                 .IsUnicode()

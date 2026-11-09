@@ -2,6 +2,7 @@
 using INustore.UseCase.Abstractions.Services;
 using INustore.UseCase.UseCases.V1.AuthService;
 using INustore.UseCase.UseCases.V1.UserService;
+using INustore.UseCase.UseCases.V1.RoleService;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace INustore.UseCase.DependencyInjection.Extensions
@@ -19,6 +20,7 @@ namespace INustore.UseCase.DependencyInjection.Extensions
 
         public static IServiceCollection AddAppServices(this IServiceCollection services)
         => services.AddScoped<IUserService, UserService>()
+                   .AddScoped<IRoleService, RoleService>()
                    .AddTransient<IAuthService, AuthService>()
                    ;
 

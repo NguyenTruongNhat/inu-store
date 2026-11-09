@@ -50,7 +50,7 @@ Mục tiêu: Thiết lập nền tảng chuẩn cho dự án.
 - [ ] **1.11** Logging và đo thời gian xử lý request bằng middleware.
 - [x] **1.12** Cấu hình Options Pattern và environment settings.
 - [x] **1.13** Tích hợp Swagger/OpenAPI.
-- [ ] **1.14** Xây dựng Health Check endpoint.
+- [x] **1.14** Xây dựng Health Check endpoint.
 
 ### Phase 02 — User Management
 

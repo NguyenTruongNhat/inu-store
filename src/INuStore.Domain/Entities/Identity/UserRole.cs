@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace INuStore.Domain.Entities.Identity
+namespace INuStore.Domain.Entities.Identity;
+
+public class UserRole : DomainEntity<int>
 {
-    public class UserRole : DomainEntity<int>
-    {
-        public int UserId { get; set; }
-        public int RoleId { get; set; }
+    public int UserId { get; set; }
+    public int RoleId { get; set; }
 
-        public User User { get; set; } = null!;
-        public Role Role { get; set; } = null!;
+    public User User { get; set; } = null!;
+    public Role Role { get; set; } = null!;
 
-    }
 }

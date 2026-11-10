@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace INuStore.API.Controllers
-{
-    [ApiController]
-    [Route("api/v{version:apiVersion}/[controller]")]
+namespace INuStore.API.Controllers;
 
-    public abstract class ApiController : ControllerBase
-    {
-    }
+[ApiController]
+[Route("api/v{version:apiVersion}/[controller]")]
+
+public abstract class ApiController : ControllerBase
+{
 }

@@ -5,29 +5,28 @@ using INustore.UseCase.UseCases.V1.UserService;
 using INustore.UseCase.UseCases.V1.RoleService;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace INustore.UseCase.DependencyInjection.Extensions
+namespace INustore.UseCase.DependencyInjection.Extensions;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static IServiceCollection AddUseCase(this IServiceCollection services)
     {
-        public static IServiceCollection AddUseCase(this IServiceCollection services)
-        {
-            services.AddAppServices();
-            services.AddAppValidators();
-            services.AddAppMappings();
+        services.AddAppServices();
+        services.AddAppValidators();
+        services.AddAppMappings();
 
-            return services;
-        }
-
-        public static IServiceCollection AddAppServices(this IServiceCollection services)
-        => services.AddScoped<IUserService, UserService>()
-                   .AddScoped<IRoleService, RoleService>()
-                   .AddTransient<IAuthService, AuthService>()
-                   ;
-
-        public static IServiceCollection AddAppMappings(this IServiceCollection services)
-        => services.AddAutoMapper(UseCase.AssemblyReference.Assembly);
-
-        public static IServiceCollection AddAppValidators(this IServiceCollection services)
-        => services.AddValidatorsFromAssembly(UseCase.AssemblyReference.Assembly, includeInternalTypes: true);
+        return services;
     }
+
+    public static IServiceCollection AddAppServices(this IServiceCollection services)
+    => services.AddScoped<IUserService, UserService>()
+               .AddScoped<IRoleService, RoleService>()
+               .AddTransient<IAuthService, AuthService>()
+               ;
+
+    public static IServiceCollection AddAppMappings(this IServiceCollection services)
+    => services.AddAutoMapper(UseCase.AssemblyReference.Assembly);
+
+    public static IServiceCollection AddAppValidators(this IServiceCollection services)
+    => services.AddValidatorsFromAssembly(UseCase.AssemblyReference.Assembly, includeInternalTypes: true);
 }

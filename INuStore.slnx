@@ -17,6 +17,7 @@
     <File Path=".agents/skills/technical-docs/references/document-template.md" />
   </Folder>
   <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
     <File Path="AGENTS.md" />
     <File Path="Directory.Build.props" />
     <File Path="skills-lock.json" />

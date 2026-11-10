@@ -23,8 +23,6 @@ public class RoleController(IRoleService roleService) : ApiController
     [HttpGet("GetRoleById")]
     [Validate<Query.GetRoleById>]
     [ProducesResponseType(typeof(Result<Response.GetRoleByIdResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetRoleById([FromQuery] Query.GetRoleById request, CancellationToken cancellationToken = default)
         => Ok(await roleService.GetRoleById(request, cancellationToken));
 
@@ -32,7 +30,6 @@ public class RoleController(IRoleService roleService) : ApiController
     [HttpPost("CreateRole")]
     [Validate<Command.CreateRole>]
     [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateRole([FromBody] Command.CreateRole request, CancellationToken cancellationToken = default)
         => Ok(await roleService.CreateRole(request, cancellationToken));
 
@@ -40,8 +37,6 @@ public class RoleController(IRoleService roleService) : ApiController
     [HttpPut("UpdateRole")]
     [Validate<Command.UpdateRole>]
     [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateRole([FromBody] Command.UpdateRole request, CancellationToken cancellationToken = default)
         => Ok(await roleService.UpdateRole(request, cancellationToken));
 
@@ -49,8 +44,6 @@ public class RoleController(IRoleService roleService) : ApiController
     [HttpDelete("DeleteRole")]
     [Validate<Command.DeleteRole>]
     [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteRole([FromBody] Command.DeleteRole request, CancellationToken cancellationToken = default)
         => Ok(await roleService.DeleteRole(request, cancellationToken));
 }

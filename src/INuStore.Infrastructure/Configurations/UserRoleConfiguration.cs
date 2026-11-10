@@ -3,24 +3,23 @@ using INuStore.Infrastructure.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace INuStore.Infrastructure.Configurations
+namespace INuStore.Infrastructure.Configurations;
+
+internal class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
 {
-    internal class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
+    public void Configure(EntityTypeBuilder<UserRole> builder)
     {
-        public void Configure(EntityTypeBuilder<UserRole> builder)
-        {
-            builder.ToTable(TableNames.UserRoles);
+        builder.ToTable(TableNames.UserRoles);
 
-            builder.HasKey(x => new { x.UserId, x.RoleId });
+        builder.HasKey(x => new { x.UserId, x.RoleId });
 
-            builder.HasOne(x => x.User)
-                .WithMany(x => x.UserRoles)
-                .HasForeignKey(x => x.UserId);
+        builder.HasOne(x => x.User)
+            .WithMany(x => x.UserRoles)
+            .HasForeignKey(x => x.UserId);
 
-            builder.HasOne(x => x.Role)
-                .WithMany(x => x.UserRoles)
-                .HasForeignKey(x => x.RoleId)
-                .OnDelete(DeleteBehavior.NoAction);
-        }
+        builder.HasOne(x => x.Role)
+            .WithMany(x => x.UserRoles)
+            .HasForeignKey(x => x.RoleId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

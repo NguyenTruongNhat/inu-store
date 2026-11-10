@@ -1,8 +1,7 @@
-﻿namespace INustore.UseCase.Abstractions.Security
+﻿namespace INustore.UseCase.Abstractions.Security;
+
+public interface IPasswordHasher
 {
-    public interface IPasswordHasher
-    {
-        string Hash(string password);
-        bool Verify(string password, string passwordHash);
-    }
+    string Hash(string password);
+    bool Verify(string password, string passwordHash);
 }

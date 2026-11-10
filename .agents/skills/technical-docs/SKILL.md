@@ -20,7 +20,7 @@ Viết để fresher hiểu vấn đề, đọc được code và biết cách �
 - Chỉ tạo/lưu/sửa file tài liệu khi yêu cầu có ý định đó. Một câu hỏi giải thích, kể cả khi gọi skill, không tự cho phép lưu file.
 - Đọc `AGENTS.md` áp dụng, tài liệu hiện có và source sở hữu hành vi trước khi viết. Kiểm tra phiên bản từ project/package/configuration thực tế; không dùng ghi chú cũ để khẳng định hiện trạng.
 - Phân biệt quy ước trong AGENTS với hành vi đang có trong code. Nếu khác nhau, mô tả rõ phần chưa khớp thay vì giả định code đã thực hiện quy ước.
-- Giữ đúng tên `INustore.UseCase` và các tên class/method/route đã xác minh. Không tự sửa code ứng dụng, package hoặc configuration để làm tài liệu trông đúng hơn.
+- Dùng namespace `INuStore.UseCase`; giữ đường dẫn project `src/INustore.UseCase/` và các tên class/method/route đã xác minh. Không tự sửa code ứng dụng, package hoặc configuration để làm tài liệu trông đúng hơn.
 
 ## Tra cứu Microsoft Learn MCP
 

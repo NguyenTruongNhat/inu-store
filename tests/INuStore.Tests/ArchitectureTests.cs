@@ -8,7 +8,7 @@ public class ArchitectureTests
 {
     private const string DomainNamespace = "INuStore.Domain";
     private const string ContractNamespace = "INuStore.Contract";
-    private const string UseCaseNamespace = "INustore.UseCase";
+    private const string UseCaseNamespace = "INuStore.UseCase";
     private const string InfrastructureNamespace = "INuStore.Infrastructure";
     private const string ApiNamespace = "INuStore.API";
 
@@ -50,7 +50,7 @@ public class ArchitectureTests
     public void UseCase_Should_Not_Depend_On_Infrastructure_Or_Api()
     {
         var result = Types
-            .InAssembly(INustore.UseCase.AssemblyReference.Assembly)
+            .InAssembly(INuStore.UseCase.AssemblyReference.Assembly)
             .ShouldNot()
             .HaveDependencyOnAny(InfrastructureNamespace, ApiNamespace)
             .GetResult();

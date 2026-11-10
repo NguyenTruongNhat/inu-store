@@ -1,4 +1,4 @@
-﻿using INustore.UseCase.Abstractions.Repositories;
+﻿using INuStore.UseCase.Abstractions.Repositories;
 using INuStore.Domain;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;

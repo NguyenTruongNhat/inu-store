@@ -1,7 +1,7 @@
 using FluentValidation;
 using INuStore.Contract.Service.V1.User;
 
-namespace INustore.UseCase.UseCases.V1.UserService.Validators;
+namespace INuStore.UseCase.UseCases.V1.UserService.Validators;
 
 /// <summary>Validates the user identifier for replacing role assignments.</summary>
 public sealed class UserRolesRouteValidator : AbstractValidator<Request.UserRolesRoute>

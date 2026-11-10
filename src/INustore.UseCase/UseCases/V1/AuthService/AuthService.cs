@@ -1,7 +1,7 @@
-﻿using INustore.UseCase.Abstractions.Security;
-using INustore.UseCase.Abstractions.Services;
-using INustore.UseCase.Abstractions.UnitOfWork;
-using INustore.UseCase.Exceptions;
+﻿using INuStore.UseCase.Abstractions.Security;
+using INuStore.UseCase.Abstractions.Services;
+using INuStore.UseCase.Abstractions.UnitOfWork;
+using INuStore.UseCase.Exceptions;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.Auth;
 using INuStore.Domain.Entities.Identity;
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
 
-namespace INustore.UseCase.UseCases.V1.AuthService;
+namespace INuStore.UseCase.UseCases.V1.AuthService;
 
 public class AuthService : IAuthService
 {
@@ -29,11 +29,7 @@ public class AuthService : IAuthService
     public async Task<Result<Response.Authenticated>> LoginAsync(Query.Login request, CancellationToken cancellationToken = default)
     {
         // Check User
-        var user = await _unitOfWork.UserRepository.GetUserByUserNameAsync(request.UserName, cancellationToken);
-        if (user is null)
-        {
-            throw new InvalidCredentialsException();
-        }
+        var user = await _unitOfWork.UserRepository.GetUserByUserNameAsync(request.UserName, cancellationToken) ?? throw new InvalidCredentialsException();
         var isPasswordValid = _passwordHasher.Verify(request.Password, user.PasswordHash);
         if (!isPasswordValid)
         {

@@ -1,6 +1,6 @@
-﻿using INustore.UseCase.Abstractions.Repositories;
-using INustore.UseCase.Abstractions.Security;
-using INustore.UseCase.Abstractions.UnitOfWork;
+﻿using INuStore.UseCase.Abstractions.Repositories;
+using INuStore.UseCase.Abstractions.Security;
+using INuStore.UseCase.Abstractions.UnitOfWork;
 using INuStore.Domain.Entities.Identity;
 using INuStore.Domain.Enums;
 using INuStore.Infrastructure.Authentication;

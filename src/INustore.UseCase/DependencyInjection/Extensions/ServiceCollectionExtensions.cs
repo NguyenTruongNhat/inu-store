@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using INustore.UseCase.Abstractions.Services;
-using INustore.UseCase.UseCases.V1.AuthService;
-using INustore.UseCase.UseCases.V1.UserService;
-using INustore.UseCase.UseCases.V1.RoleService;
+using INuStore.UseCase.Abstractions.Services;
+using INuStore.UseCase.UseCases.V1.AuthService;
+using INuStore.UseCase.UseCases.V1.UserService;
+using INuStore.UseCase.UseCases.V1.RoleService;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace INustore.UseCase.DependencyInjection.Extensions;
+namespace INuStore.UseCase.DependencyInjection.Extensions;
 
 public static class ServiceCollectionExtensions
 {

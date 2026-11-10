@@ -1,6 +1,6 @@
-﻿using INustore.UseCase.Abstractions.Repositories;
+﻿using INuStore.UseCase.Abstractions.Repositories;
 
-namespace INustore.UseCase.Abstractions.UnitOfWork;
+namespace INuStore.UseCase.Abstractions.UnitOfWork;
 
 public interface IUnitOfWork : IAsyncDisposable
 {

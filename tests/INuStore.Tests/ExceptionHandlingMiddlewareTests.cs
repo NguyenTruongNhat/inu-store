@@ -1,4 +1,4 @@
-using INustore.UseCase.Exceptions;
+using INuStore.UseCase.Exceptions;
 using INuStore.API.Middlewares;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;

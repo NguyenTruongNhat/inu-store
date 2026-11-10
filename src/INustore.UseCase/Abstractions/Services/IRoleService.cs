@@ -1,7 +1,7 @@
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.Role;
 
-namespace INustore.UseCase.Abstractions.Services;
+namespace INuStore.UseCase.Abstractions.Services;
 
 /// <summary>Reads roles and stages role changes for the current unit of work.</summary>
 public interface IRoleService

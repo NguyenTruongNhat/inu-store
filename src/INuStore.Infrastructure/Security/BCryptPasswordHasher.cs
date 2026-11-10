@@ -1,4 +1,4 @@
-﻿using INustore.UseCase.Abstractions.Security;
+﻿using INuStore.UseCase.Abstractions.Security;
 
 namespace INuStore.Infrastructure.Security;
 

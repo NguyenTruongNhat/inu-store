@@ -1,4 +1,4 @@
-﻿using INustore.UseCase.Abstractions.Services;
+﻿using INuStore.UseCase.Abstractions.Services;
 using INuStore.Contract.Service.V1.Auth;
 using Microsoft.AspNetCore.Mvc;
 

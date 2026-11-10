@@ -11,7 +11,7 @@ This guide applies to the whole repository. INuStore is a .NET 10 ASP.NET Core A
 | `src/INuStore.API/` | Controllers, validation filters, middleware, versioned Swagger, and composition in `Program.cs`. |
 | `src/INuStore.Contract/` | Nested `Command`, `Query`, and `Response` records in `Service/V1/User/`; `Result`, validation results, errors, and pagination in `Abstractions/Share/`. |
 | `src/INuStore.Domain/` | `DomainEntity<T>`, `Entities/Identity/User.cs`, and domain exceptions. |
-| `src/INustore.UseCase/` | Interfaces in `Abstractions/`, services and validators in `UseCases/V1/`, AutoMapper profiles in `Mappings/`, and DI extensions. Preserve the existing `INustore` spelling in paths and namespaces. |
+| `src/INustore.UseCase/` | Interfaces in `Abstractions/`, services and validators in `UseCases/V1/`, AutoMapper profiles in `Mappings/`, and DI extensions. Keep the existing `INustore.UseCase` spelling in filesystem paths; use `INuStore.UseCase` for namespaces. |
 | `src/INuStore.Infrastructure/` | `ApplicationDbContext`, repositories, `EFUnitOfWork`, entity configurations, SQL options, and migrations. |
 | `tests/INuStore.Tests/` | xUnit login/middleware behavior tests and NetArchTest architecture tests. The solution folder is misspelled `/tets/`; the disk path is `tests/`. |
 | `Docs/` | Vietnamese technical notes. `custom-middleware.MD` is currently empty. |

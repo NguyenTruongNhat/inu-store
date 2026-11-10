@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-using INustore.UseCase.Abstractions.UnitOfWork;
+using INuStore.UseCase.Abstractions.UnitOfWork;
 using INuStore.Contract.Service.V1.User;
 
-namespace INustore.UseCase.UseCases.V1.UserService.Validators;
+namespace INuStore.UseCase.UseCases.V1.UserService.Validators;
 
 public class UpdateUserValidator : AbstractValidator<Command.UpdateUser>
 {

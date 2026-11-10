@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
-using INustore.UseCase.Abstractions.Security;
-using INustore.UseCase.Abstractions.Services;
-using INustore.UseCase.Abstractions.UnitOfWork;
+using INuStore.UseCase.Abstractions.Security;
+using INuStore.UseCase.Abstractions.Services;
+using INuStore.UseCase.Abstractions.UnitOfWork;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.User;
 using INuStore.Domain.Entities.Identity;
 using INuStore.Domain.Exceptions;
 
-namespace INustore.UseCase.UseCases.V1.UserService;
+namespace INuStore.UseCase.UseCases.V1.UserService;
 
 public class UserService : IUserService
 {

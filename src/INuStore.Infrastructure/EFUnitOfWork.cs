@@ -1,5 +1,5 @@
-﻿using INustore.UseCase.Abstractions.Repositories;
-using INustore.UseCase.Abstractions.UnitOfWork;
+﻿using INuStore.UseCase.Abstractions.Repositories;
+using INuStore.UseCase.Abstractions.UnitOfWork;
 using INuStore.Infrastructure.Exceptions;
 using Microsoft.EntityFrameworkCore;
 

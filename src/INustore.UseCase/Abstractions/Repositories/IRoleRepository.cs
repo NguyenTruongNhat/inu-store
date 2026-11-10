@@ -1,6 +1,6 @@
 using INuStore.Domain.Entities.Identity;
 
-namespace INustore.UseCase.Abstractions.Repositories;
+namespace INuStore.UseCase.Abstractions.Repositories;
 
 /// <summary>Provides role persistence and database-backed rule checks.</summary>
 public interface IRoleRepository : IRepositoryBase<Role, int>

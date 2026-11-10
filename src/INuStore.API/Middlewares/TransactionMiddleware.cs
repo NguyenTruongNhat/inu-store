@@ -1,6 +1,6 @@
 ﻿using INuStore.Infrastructure;
 
-using INustore.UseCase.Abstractions.UnitOfWork;
+using INuStore.UseCase.Abstractions.UnitOfWork;
 
 namespace INuStore.API.Middlewares;
 

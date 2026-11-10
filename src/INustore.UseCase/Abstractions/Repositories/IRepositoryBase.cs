@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace INustore.UseCase.Abstractions.Repositories;
+namespace INuStore.UseCase.Abstractions.Repositories;
 
 public interface IRepositoryBase<TEntity, in TKey> where TEntity : class
 {

@@ -1,4 +1,4 @@
-﻿using INustore.UseCase.Exceptions;
+﻿using INuStore.UseCase.Exceptions;
 using INuStore.Domain.Exceptions;
 using System.Text.Json;
 
@@ -66,7 +66,7 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
 
     private static IReadOnlyCollection<ValidationError> GetErrors(Exception exception)
     {
-        IReadOnlyCollection<ValidationError> errors = null;
+        IReadOnlyCollection<ValidationError>? errors = null;
 
         if (exception is ValidationException validationException)
         {

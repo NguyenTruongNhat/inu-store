@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace INustore.UseCase.Abstractions.Security;
+namespace INuStore.UseCase.Abstractions.Security;
 
 public interface IJwtTokenService
 {

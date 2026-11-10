@@ -1,4 +1,4 @@
-using INustore.UseCase.Abstractions.Services;
+using INuStore.UseCase.Abstractions.Services;
 using INuStore.API.Filters;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.Role;

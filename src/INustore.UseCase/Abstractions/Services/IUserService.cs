@@ -1,19 +1,19 @@
 ﻿using INuStore.Contract.Service.V1.User;
 using INuStore.Contract.Abstractions.Share;
 
-namespace INustore.UseCase.Abstractions.Services;
+namespace INuStore.UseCase.Abstractions.Services;
 
 public interface IUserService
 {
-    public Task<Result<Response.GetUserByIdResponse>> GetUserById(Query.GetUserById request, CancellationToken cancellationToken = default);
-    public Task<Result<Response.GetAllUsersResponse>> GetAllUsers(Query.GetAllUsers request, CancellationToken cancellationToken = default);
+    Task<Result<Response.GetUserByIdResponse>> GetUserById(Query.GetUserById request, CancellationToken cancellationToken = default);
+    Task<Result<Response.GetAllUsersResponse>> GetAllUsers(Query.GetAllUsers request, CancellationToken cancellationToken = default);
     Task<Result> CreateUser(Command.CreateUser request, CancellationToken cancellationToken = default);
-    public Task<Result> UpdateUser(Command.UpdateUser request, CancellationToken cancellationToken = default);
-    public Task<Result> DeleteUser(Command.DeleteUser request, CancellationToken cancellationToken = default);
-    public Task<Result<Response.GetUserRolesResponse>> GetUserRoles(int userId, CancellationToken cancellationToken = default);
-    public Task<Result> AssignRoleToUser(Command.AssignRoleToUser request, CancellationToken cancellationToken = default);
-    public Task<Result> RemoveRoleFromUser(Command.RemoveRoleFromUser request, CancellationToken cancellationToken = default);
+    Task<Result> UpdateUser(Command.UpdateUser request, CancellationToken cancellationToken = default);
+    Task<Result> DeleteUser(Command.DeleteUser request, CancellationToken cancellationToken = default);
+    Task<Result<Response.GetUserRolesResponse>> GetUserRoles(int userId, CancellationToken cancellationToken = default);
+    Task<Result> AssignRoleToUser(Command.AssignRoleToUser request, CancellationToken cancellationToken = default);
+    Task<Result> RemoveRoleFromUser(Command.RemoveRoleFromUser request, CancellationToken cancellationToken = default);
     /// <summary>Replaces all role assignments after verifying that every requested role exists.</summary>
-    public Task<Result> ReplaceUserRoles(int userId, Command.ReplaceUserRoles request, CancellationToken cancellationToken = default);
+    Task<Result> ReplaceUserRoles(int userId, Command.ReplaceUserRoles request, CancellationToken cancellationToken = default);
 
 }

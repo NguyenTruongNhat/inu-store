@@ -2,7 +2,7 @@ using AutoMapper;
 using INuStore.Contract.Service.V1.Role;
 using INuStore.Domain.Entities.Identity;
 
-namespace INustore.UseCase.Mappings;
+namespace INuStore.UseCase.Mappings;
 
 public class RoleProfile : Profile
 {

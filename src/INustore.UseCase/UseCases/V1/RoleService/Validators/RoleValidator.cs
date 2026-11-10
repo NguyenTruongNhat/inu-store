@@ -1,7 +1,7 @@
 using FluentValidation;
 using INuStore.Contract.Service.V1.Role;
 
-namespace INustore.UseCase.UseCases.V1.RoleService.Validators;
+namespace INuStore.UseCase.UseCases.V1.RoleService.Validators;
 
 public sealed class CreateRoleValidator : AbstractValidator<Command.CreateRole>
 {

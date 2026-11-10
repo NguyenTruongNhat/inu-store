@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace INustore.UseCase;
+namespace INuStore.UseCase;
 
 public static class AssemblyReference
 {

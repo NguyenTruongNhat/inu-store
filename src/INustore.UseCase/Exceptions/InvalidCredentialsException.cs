@@ -1,6 +1,6 @@
 using INuStore.Domain.Exceptions;
 
-namespace INustore.UseCase.Exceptions;
+namespace INuStore.UseCase.Exceptions;
 
 public sealed class InvalidCredentialsException : DomainException
 {

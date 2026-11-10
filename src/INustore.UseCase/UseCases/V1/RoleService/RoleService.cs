@@ -1,13 +1,13 @@
 using AutoMapper;
-using INustore.UseCase.Abstractions.Services;
-using INustore.UseCase.Abstractions.UnitOfWork;
+using INuStore.UseCase.Abstractions.Services;
+using INuStore.UseCase.Abstractions.UnitOfWork;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.Role;
 using INuStore.Domain.Entities.Identity;
 using INuStore.Domain.Enums;
 using INuStore.Domain.Exceptions;
 
-namespace INustore.UseCase.UseCases.V1.RoleService;
+namespace INuStore.UseCase.UseCases.V1.RoleService;
 
 /// <summary>Applies role rules without taking ownership of saving or committing changes.</summary>
 public sealed class RoleService(IUnitOfWork unitOfWork, IMapper mapper) : IRoleService
@@ -46,8 +46,8 @@ public sealed class RoleService(IUnitOfWork unitOfWork, IMapper mapper) : IRoleS
     {
         var role = await FindRoleAsync(request.RoleId, cancellationToken);
         var name = request.Name.Trim();
-        if ((IsBuiltIn(role.Name) && !string.Equals(role.Name, name, StringComparison.Ordinal))
-            || (!IsBuiltIn(role.Name) && IsBuiltIn(name)))
+        if (IsBuiltIn(role.Name) && !string.Equals(role.Name, name, StringComparison.Ordinal)
+            || !IsBuiltIn(role.Name) && IsBuiltIn(name))
         {
             throw new RoleException.BuiltInRoleException();
         }

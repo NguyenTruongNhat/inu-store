@@ -1,8 +1,8 @@
-using INustore.UseCase.Abstractions.Repositories;
-using INustore.UseCase.Abstractions.Security;
-using INustore.UseCase.Abstractions.UnitOfWork;
-using INustore.UseCase.Exceptions;
-using INustore.UseCase.UseCases.V1.AuthService;
+using INuStore.UseCase.Abstractions.Repositories;
+using INuStore.UseCase.Abstractions.Security;
+using INuStore.UseCase.Abstractions.UnitOfWork;
+using INuStore.UseCase.Exceptions;
+using INuStore.UseCase.UseCases.V1.AuthService;
 using INuStore.Contract.Service.V1.Auth;
 using INuStore.Domain.Entities.Identity;
 using Moq;

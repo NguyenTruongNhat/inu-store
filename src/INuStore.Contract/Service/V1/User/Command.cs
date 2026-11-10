@@ -11,5 +11,8 @@
 
         /// <summary>Removes a role assignment using identifiers bound from the request route.</summary>
         public sealed record RemoveRoleFromUser(int UserId, int RoleId);
+
+        /// <summary>Replaces all roles assigned to a user with the supplied role identifiers.</summary>
+        public sealed record ReplaceUserRoles(List<int> RoleIds);
     }
 }

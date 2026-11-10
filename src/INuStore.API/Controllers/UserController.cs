@@ -75,6 +75,23 @@ namespace INuStore.API.Controllers
         }
 
         [Authorize]
+        [HttpPut("{userId:int}/roles")]
+        [Validate<Request.UserRolesRoute>]
+        [Validate<Command.ReplaceUserRoles>]
+        [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ReplaceUserRoles(
+            [FromRoute] Request.UserRolesRoute route,
+            [FromBody] Command.ReplaceUserRoles request,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _userService.ReplaceUserRoles(route.UserId, request, cancellationToken);
+            return Ok(result);
+        }
+
+        [Authorize]
         [HttpPut("{userId:int}/roles/{roleId:int}")]
         [Validate<Command.AssignRoleToUser>]
         [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]

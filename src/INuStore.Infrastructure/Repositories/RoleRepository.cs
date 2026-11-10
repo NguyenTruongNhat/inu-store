@@ -19,6 +19,10 @@ public sealed class RoleRepository : RepositoryBase<Role, int>, IRoleRepository
         => FindAll().OrderBy(role => role.Id).ToListAsync(cancellationToken);
 
     /// <inheritdoc />
+    public Task<List<Role>> GetByIdsAsync(IReadOnlyCollection<int> roleIds, CancellationToken cancellationToken = default)
+        => FindAll(role => roleIds.Contains(role.Id)).Distinct().ToListAsync(cancellationToken);
+
+    /// <inheritdoc />
     public Task<bool> NameExistsAsync(string name, int? excludedRoleId = null, CancellationToken cancellationToken = default)
         => FindAll(role => role.Name == name && (!excludedRoleId.HasValue || role.Id != excludedRoleId.Value))
             .AnyAsync(cancellationToken);

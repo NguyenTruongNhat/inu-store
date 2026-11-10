@@ -111,7 +111,7 @@ namespace INustore.UseCase.UseCases.V1.UserService
         public async Task<Result> RemoveRoleFromUser(Command.RemoveRoleFromUser request, CancellationToken cancellationToken = default)
         {
             var user = await GetUserWithRoleAsync(request.UserId, cancellationToken);
-            var role = await _unitOfWork.RoleRepository.FindByIdAsync(request.RoleId, cancellationToken) 
+            var role = await _unitOfWork.RoleRepository.FindByIdAsync(request.RoleId, cancellationToken)
                         ?? throw new RoleException.RoleNotFoundException(request.RoleId);
             var assignedRole = user.UserRoles.FirstOrDefault(ur => ur.RoleId == request.RoleId);
             if (assignedRole == null)
@@ -119,6 +119,39 @@ namespace INustore.UseCase.UseCases.V1.UserService
                 return Result.Success(); // Role is not assigned to the user, nothing to remove
             }
             _unitOfWork.UserRepository.RemoveUserRole(assignedRole);
+            return Result.Success();
+        }
+
+        /// <inheritdoc />
+        public async Task<Result> ReplaceUserRoles(int userId, Command.ReplaceUserRoles request, CancellationToken cancellationToken = default)
+        {
+            //#avoiding-dbcontext-threading-issues
+            // threading issues can occur when using the same DbContext instance across multiple threads.
+            // threre are two await callls. if you use WhenAll, it will run both await calls in parallel, which can lead to threading issues with the DbContext.
+            // if there are two call AsNoTracking, you can use WhenAll, but if you are using tracking queries, it's safer to await them sequentially to avoid potential threading issues.
+
+            // check requested roles exist
+            var requestedRoleExistingInSystem = await _unitOfWork.RoleRepository.GetByIdsAsync(request.RoleIds, cancellationToken);
+            // get user with roles
+            var user = await GetUserWithRoleAsync(userId, cancellationToken);
+            var userCurrentRoleIds = user.UserRoles.Select(ur => ur.RoleId).ToList();
+
+            var rolesToAdd = requestedRoleExistingInSystem.Where(r => !userCurrentRoleIds.Contains(r.Id)).ToList();
+            var rolesToRemove = user.UserRoles.Where(ur => !request.RoleIds.Contains(ur.RoleId)).ToList();
+
+            foreach (var role in rolesToAdd)
+            {
+                var assignment = new UserRole
+                {
+                    UserId = user.Id,
+                    RoleId = role.Id
+                };
+                _unitOfWork.UserRepository.AddUserRole(assignment);
+            }
+            foreach (var roleToRemove in rolesToRemove)
+            {
+                _unitOfWork.UserRepository.RemoveUserRole(roleToRemove);
+            }
             return Result.Success();
         }
 

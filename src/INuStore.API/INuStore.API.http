@@ -55,6 +55,69 @@ GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/{{userId}}/roles
 Authorization: Bearer {{accessToken}}
 Accept: application/json
 
+### Replace all roles (use existing IDs; repeat this request to verify idempotency)
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/{{userId}}/roles
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{ "roleIds": [1, 3, 4] }
+
+### Duplicate IDs are normalized: same role set as above
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/{{userId}}/roles
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{ "roleIds": [1, 3, 3, 4] }
+
+### Empty list: HTTP 400 when SQL Server is available
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/{{userId}}/roles
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{ "roleIds": [] }
+
+### Null list: HTTP 400 when SQL Server is available
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/{{userId}}/roles
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{ "roleIds": null }
+
+### Invalid role IDs: HTTP 400 when SQL Server is available
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/{{userId}}/roles
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{ "roleIds": [0, -1] }
+
+### Invalid user ID: HTTP 400 via FluentValidation when SQL Server is available
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/0/roles
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{ "roleIds": [1] }
+
+### Negative user ID: HTTP 400 via FluentValidation when SQL Server is available
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/-1/roles
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{ "roleIds": [1] }
+
+### Missing user: HTTP 404 (choose an ID absent from the database)
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/2147483647/roles
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{ "roleIds": [1] }
+
+### Missing role: HTTP 404; no assignments are changed
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/{{userId}}/roles
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{ "roleIds": [1, 2147483647] }
+
 ### Assign a role (repeat to verify success without a duplicate assignment)
 PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/{{userId}}/roles/{{roleId}}
 Authorization: Bearer {{accessToken}}

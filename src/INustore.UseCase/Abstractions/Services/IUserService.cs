@@ -13,6 +13,8 @@ namespace INustore.UseCase.Abstractions.Services
         public Task<Result<Response.GetUserRolesResponse>> GetUserRoles(int userId, CancellationToken cancellationToken = default);
         public Task<Result> AssignRoleToUser(Command.AssignRoleToUser request, CancellationToken cancellationToken = default);
         public Task<Result> RemoveRoleFromUser(Command.RemoveRoleFromUser request, CancellationToken cancellationToken = default);
+        /// <summary>Replaces all role assignments after verifying that every requested role exists.</summary>
+        public Task<Result> ReplaceUserRoles(int userId, Command.ReplaceUserRoles request, CancellationToken cancellationToken = default);
 
     }
 }

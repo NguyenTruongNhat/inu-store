@@ -19,6 +19,7 @@
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
     <File Path="AGENTS.md" />
+    <File Path="AGENTS-VN.md" />
     <File Path="Directory.Build.props" />
     <File Path="skills-lock.json" />
   </Folder>

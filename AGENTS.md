@@ -1,71 +1,55 @@
 # Repository Guidelines
 
-This guide applies to the whole repository. INuStore is a .NET 10 ASP.NET Core API with user CRUD, EF Core SQL Server persistence, and no frontend. Check the owning source before changing behavior; the notes in `Docs/` include historical examples.
+INuStore is a .NET 10 ASP.NET Core API for authentication, users, roles, and user-role assignments. It uses EF Core with SQL Server. This guide applies to the whole repository. [AGENTS-VN.md](AGENTS-VN.md) is the Vietnamese companion. Check the owning source before relying on examples in [technical-docs](technical-docs/).
 
-## Project Map
+## Project map and dependencies
 
-`INuStore.slnx` contains five source projects and one test project:
+[INuStore.slnx](INuStore.slnx) contains five source projects and one test project.
 
 | Location | Responsibility |
 | --- | --- |
-| `src/INuStore.API/` | Controllers, validation filters, middleware, versioned Swagger, and composition in `Program.cs`. |
-| `src/INuStore.Contract/` | Nested `Command`, `Query`, and `Response` records in `Service/V1/User/`; `Result`, validation results, errors, and pagination in `Abstractions/Share/`. |
-| `src/INuStore.Domain/` | `DomainEntity<T>`, `Entities/Identity/User.cs`, and domain exceptions. |
-| `src/INustore.UseCase/` | Interfaces in `Abstractions/`, services and validators in `UseCases/V1/`, AutoMapper profiles in `Mappings/`, and DI extensions. Keep the existing `INustore.UseCase` spelling in filesystem paths; use `INuStore.UseCase` for namespaces. |
-| `src/INuStore.Infrastructure/` | `ApplicationDbContext`, repositories, `EFUnitOfWork`, entity configurations, SQL options, and migrations. |
-| `tests/INuStore.Tests/` | xUnit login/middleware behavior tests and NetArchTest architecture tests. The solution folder is misspelled `/tets/`; the disk path is `tests/`. |
-| `Docs/` | Vietnamese technical notes. `custom-middleware.MD` is currently empty. |
+| `src/INuStore.API/` | HTTP endpoints, JWT Bearer authentication and policies, validation filters, middleware, health probes, versioned Swagger, and service composition. Start with `Program.cs`. |
+| `src/INuStore.Contract/` | Versioned request and response records under `Service/V1/{Auth,User,Role}/`. Shared `Result`, validation errors, and pagination types live in `Abstractions/Share/`. |
+| `src/INuStore.Domain/` | `User`, `Role`, `UserRole`, `RoleType`, and domain exceptions. |
+| `src/INustore.UseCase/` | Service, repository, unit-of-work, and security interfaces in `Abstractions/`. Business services and validators live in `UseCases/V1/`. Mapping profiles live in `Mappings/`. Keep this spelling for filesystem paths and use `INuStore.UseCase` for namespaces. |
+| `src/INuStore.Infrastructure/` | EF context, repository and unit-of-work implementations, SQL Server exception translation, entity mappings, migrations, BCrypt, and JWT generation. |
+| `tests/INuStore.Tests/` | xUnit tests with Moq and NetArchTest. The Visual Studio solution folder is `/tets/` and the disk folder is `tests/`. |
 
-## Project MCP
+Domain and Contract have no references to other solution layers. UseCase depends on Domain and Contract. Infrastructure implements UseCase abstractions and may depend on Domain and Contract. API composes UseCase and Infrastructure. `ArchitectureTests.cs` checks these boundaries. Contract already references EF Core for `PagedResult<T>.CreateAsync`.
 
-The project-local `.codex/config.toml` configures `microsoft-learn` at `https://learn.microsoft.com/api/mcp`. Use this server for official C#, .NET, ASP.NET Core, and EF Core documentation when available.
+Keep HTTP concerns in API and persistence details in Infrastructure. Controllers call UseCase services directly. Register services through the existing `AddInfrastructure(configuration)`, `AddUseCase()`, and `AddApi(configuration)` extensions. `IUserService` and `IRoleService` are scoped. `IAuthService`, repositories, unit of work, password hashing, and token services are transient. Validators and AutoMapper profiles are discovered in the UseCase assembly. `TransactionMiddleware` is scoped and `ExceptionHandlingMiddleware` is transient.
 
-Commit this configuration with the repository. After cloning, trust the project in Codex and reopen the client to load the MCP configuration. Run `codex mcp list` from the repository root to check the configured server.
+## Request and database flow
 
-## Architecture and Dependency Injection
+- `ApiController` uses `api/v{version:apiVersion}/[controller]`. Auth, User, and Role declare version 1. Use the action's binding attributes to distinguish query, route, and JSON body parameters. Update `src/INuStore.API/INuStore.API.http` when changing an endpoint.
+- `[Validate<TModel>]` attaches `ValidationFilter<TModel>` to run the registered FluentValidation validators on the bound argument. It uses `RequestAborted`, deduplicates errors, and returns HTTP 400 with `ValidationResult.WithErrors`. Apply the attribute on actions that need these rules. MVC binding and data-annotation errors can use the default `[ApiController]` response.
+- `ExceptionHandlingMiddleware` is registered before authorization and transactions in `Program.cs`. It maps exceptions to JSON `{ title, status, detail, errors }`. Invalid credentials map to 401, domain bad requests to 400, not-found exceptions to 404, and `FormatException` to 422. Other exceptions, including UseCase `ValidationException`, currently map to 500. The middleware includes `exception.Message` in `detail`. Keep sensitive data out of exception messages returned by the API.
+- After authorization, `TransactionMiddleware` opens a transaction for POST, PUT, PATCH, and DELETE before MVC binding and validation. This includes POST login. It buffers the response and rolls back on status >= 400. For other statuses it awaits `IUnitOfWork.SaveChangesAsync`, commits, then copies the response. Exceptions propagate to the outer middleware after disposal of the uncommitted transaction. GET bypasses the transaction.
+- Repository writes stage EF changes. Keep a single owner for saving and committing. Application writes save through `IUnitOfWork.SaveChangesAsync`. A caller outside this HTTP pipeline needs an explicit persistence boundary. Controllers currently return `Ok(result)`. An unsuccessful `Result` alone does not trigger rollback. Map failures to an appropriate HTTP status and avoid serializing a failed `Result<T>` directly because its `Value` getter throws.
+- `AddDbContextPool<DbContext, ApplicationDbContext>` supplies the request's shared context to middleware, repositories, and unit of work. Await operations on that instance sequentially, including `AsNoTracking()` queries. `FindAll` returns an untracked query. `FindByIdAsync` and `FindSingleAsync` enable tracking. `GetUserWithRolesAsync` uses `Include` and `ThenInclude` with no tracking. Lazy-loading proxies are disabled. [EF Core guidance on DbContext concurrency](https://learn.microsoft.com/en-us/ef/core/dbcontext-configuration/#avoiding-dbcontext-threading-issues)
+- `EFUnitOfWork` passes `DbUpdateException` to `SqlServerExceptionTranslator`. The translator recognizes duplicate role names and attempts to delete assigned roles using SQL Server error numbers, constraint names in message text, and entity state. Preserve the original exception as `InnerException` and propagate unrecognized errors unchanged. Direct context saves, including role seeding, bypass translation.
+- `SqlServerRetryOptions` is bound and validated at startup. The retry execution strategy is commented out. Review explicit transaction ownership before enabling retries.
 
-Keep these solution-layer boundaries, enforced by `ArchitectureTests.cs`:
+## Current endpoint behavior
 
-- Domain and Contract must not depend on other solution layers.
-- UseCase may depend on Domain and Contract, but not Infrastructure or API.
-- Infrastructure may depend on Domain, Contract, and UseCase, but not API.
-- API references UseCase and Infrastructure and composes their registrations.
+| Endpoint or feature | Behavior to verify before changing it |
+| --- | --- |
+| `POST /api/v1/Auth/Login` | Looks up the username and verifies the stored BCrypt hash. Unknown user and incorrect password produce the same 401 and generate no tokens. Success returns an HS256 access token with user ID, username, and email claims, plus a randomly generated refresh token. The current login flow returns the refresh token without persisting it, and the API has no refresh endpoint. |
+| User CRUD | `CreateUser` maps one user, hashes the password through `IPasswordHasher`, and stages the insert. `UserProfile` temporarily maps the input password to `PasswordHash`, which the service overwrites before `Add`. Keep passwords and hashes out of response DTOs. `GetAllUsers` currently loads the full list despite accepting `PageIndex` and `PageSize`. `GetUserById` requires `UserId > 7` and throws when the user is missing. Update requires a positive ID. Update and delete return success for missing users. The delete lookup currently omits the cancellation token. |
+| `/api/v1/Role/{GetAllRoles,GetRoleById,CreateRole,UpdateRole,DeleteRole}` | All actions require authentication and successful actions return HTTP 200 with a `Result` envelope. The list is ordered by ID and role DTOs omit assignments. A missing role on get, update, or delete returns 404. Invalid input and role-rule violations return 400. |
+| `GET /api/v1/User/{userId}/roles` and `PUT` or `DELETE /api/v1/User/{userId}/roles/{roleId}` | Require authentication. Route IDs are positive integers. The read returns roles ordered by name. Assignment and removal look up the user and role, return 404 for missing entities, and succeed without staging another change when the requested assignment state already holds. |
+| `PUT /api/v1/User/{userId}/roles` | Requires authentication. Separate filters validate a positive route ID and a nonempty body `roleIds` list of positive integers. The service queries existing roles for the IDs and loads the user sequentially. A missing user returns 404. Missing role IDs are currently skipped for additions, while removals use the submitted list, so a request with unknown IDs can partially replace or clear the assignments and still return success. Concurrent replacements are not serialized. |
+| `/health/live` and `/health/ready` | Anonymous and unversioned. Liveness excludes all dependency checks. Readiness runs the `sqlserver` connectivity check against the EF context, tagged `ready` with a five-second timeout. Expected default results are plaintext `200 Healthy` or `503 Unhealthy`. Readiness checks connectivity without applying migrations or checking schema compatibility. |
 
-Contract currently references EF Core for `PagedResult<T>.CreateAsync`; layer independence does not mean the project has no external dependencies. Keep repository and unit-of-work interfaces in UseCase, persistence implementations in Infrastructure, and HTTP concerns in API. Controllers call services directly; there is no mediator pipeline.
+Role names are trimmed, required, and limited to 256 characters. Uniqueness follows SQL Server collation. `RoleType` names are reserved case-insensitively. A built-in role can change description but cannot be renamed or deleted. Assigned roles cannot be deleted. The composite `UserId`/`RoleId` key prevents duplicate assignments. The unique role-name index and non-cascading role foreign key require migration `20261109132818_ProtectRoleNamesAndAssignments`. Resolve existing duplicate role names before applying it.
 
-Use the existing DI extension methods. `AddAppServices` explicitly registers `IUserService` as scoped; `AddAppValidators` and `AddAppMappings` scan the UseCase assembly. `AddRepositoryBaseConfiguration` registers unit of work and repositories as transient. `AddSqlConfiguration` uses `AddDbContextPool<DbContext, ApplicationDbContext>`. Keep middleware and repositories using the request's shared context; `TransactionMiddleware` is scoped and `ExceptionHandlingMiddleware` is transient.
+`AddApi` registers JWT Bearer authentication and the `allow-gmail` policy. `WebApplication` adds authentication middleware automatically with this registration. `Program.cs` calls `UseAuthorization()` explicitly. `GetUserById` requires an authenticated user with an email claim ending in `@gmail.com`. `GetAllUsers`, role CRUD, and user-role endpoints require authentication. User create, update, delete, and login have no authorization attribute or configured fallback policy. JWT validation checks lifetime and the signing key. Issuer and audience validation are disabled in the current configuration. [ASP.NET Core middleware registration](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-10.0#middleware-added-automatically-by-webapplication)
 
-## Request, Validation, and Persistence Flow
+Swagger defines a shared HTTP Bearer scheme. Paste the raw access token into Authorize. Endpoint access follows the actual authorization metadata. Development calls `MapOpenApi()`, and the current service registrations lack `AddOpenApi()`. Verify Development startup when working on API documentation or startup.
 
-- `ApiController` supplies `api/v{version:apiVersion}/[controller]`. `UserController` declares version `1`; actions use routes such as `/api/v1/User/GetUserById`. GET models bind from query strings; POST, PUT, and DELETE commands bind from JSON bodies. Maintain examples in `src/INuStore.API/INuStore.API.http` when endpoints change.
-- `[Validate<TModel>]` attaches `ValidationFilter<TModel>` to an action. It validates the bound action argument asynchronously and returns HTTP 400 with a non-generic `ValidationResult` on failure. Registering a validator alone does not attach the filter. MVC model-binding errors can use the separate default `[ApiController]` response.
-- `ExceptionHandlingMiddleware` wraps the transaction/controller flow. It returns `{ title, status, detail, errors }`: `InvalidCredentialsException` maps to 401, `BadRequestException` to 400, `NotFoundException` to 404, `FormatException` to 422, and other exceptions to 500. The UseCase `ValidationException` currently falls through to 500; its special status mapping is commented out.
-- `TransactionMiddleware` wraps POST, PUT, PATCH, and DELETE in a database transaction before MVC validation runs. It buffers the response, rolls back for HTTP status >= 400, and otherwise awaits `SaveChangesAsync` and commit before copying the response. Exceptions leave the transaction uncommitted and reach the outer exception middleware. GET requests skip the transaction.
-- Services currently stage writes through repositories and rely on middleware to save. Avoid adding extra save/transaction ownership without accounting for that flow. Calls outside HTTP middleware need an explicit persistence boundary. `FindAll` returns an `AsNoTracking` query; `FindByIdAsync` and `FindSingleAsync` opt into tracking.
-- Application writes must save through `IUnitOfWork.SaveChangesAsync`. `TransactionMiddleware` calls the unit of work once before committing its transaction; the unit of work, middleware, and repositories share the request context. `EFUnitOfWork` catches `DbUpdateException` and delegates recognized SQL Server constraint violations to `Infrastructure/Exceptions/SqlServerExceptionTranslator`. Add future database error mappings there, preserve the original exception as `InnerException`, and let unrecognized failures propagate unchanged. The translator still relies on SQL Server message text for constraint names. Direct context saves, including existing seeding, bypass this translation.
-- SQL retry options are bound and validated, but the retrying execution strategy is commented out. If enabling retries, review how explicit transactions are executed together with retries.
+## Local development and migrations
 
-## Current Behavior to Check Before Extending
-
-Recheck these existing behaviors when relevant to the requested work, and update this section when they change:
-
-- Role CRUD uses `/api/v1/Role/{GetAllRoles,GetRoleById,CreateRole,UpdateRole,DeleteRole}` and requires authentication for every action. Reads return role DTOs without assignments; get-all returns all roles ordered by ID. Successful actions use HTTP 200 and `Result` envelopes. Missing roles return 404 for get/update/delete; validation and role-rule violations return 400.
-- User-role APIs require authentication: GET `/api/v1/User/{userId:int}/roles`, PUT/DELETE `/api/v1/User/{userId:int}/roles/{roleId:int}`, and PUT `/api/v1/User/{userId:int}/roles`. The last endpoint replaces the complete role set using a JSON `roleIds` list. Separate route/body FluentValidation filters require a positive user ID and a non-empty list of positive role IDs; duplicates are normalized. All requested roles are checked in one query before staging changes; a missing user or role returns 404. Existing assignments are retained, obsolete assignments removed, and missing assignments added. Sequential repeats succeed. Saves remain owned by transaction middleware; concurrent replacements are not serialized by this feature.
-- Role names are trimmed, required, and limited to 256 characters. A unique name index follows the database collation. Names defined by `RoleType` are reserved case-insensitively: built-in descriptions can change, but built-in names cannot be renamed/deleted or claimed by custom roles. Assigned roles cannot be deleted; the role-side foreign key is non-cascading. The role protection migration must be applied before relying on these database constraints; existing duplicate names must be resolved first. Role CRUD does not manage user-role assignments.
-
-- Operational probes are anonymous and unversioned: `/health/live` only checks that the API responds, while `/health/ready` checks SQL Server connectivity through the existing EF Core context. The `sqlserver` check has the `ready` tag and a five-second registration timeout. Responses use the framework's non-cacheable plaintext output: `200 Healthy` or `503 Unhealthy`. Readiness does not validate the schema or run migrations/seeding.
-- Swagger declares a shared HTTP Bearer security scheme and requirement. Use `Authorize` with the raw access token; Swagger adds the `Bearer` prefix. Actual endpoint access still follows the existing `[Authorize]` attributes.
-- `LoginAsync` throws the UseCase `InvalidCredentialsException` for either a missing user or an invalid password. Both return HTTP 401 with title `Authentication Failure` and detail `Invalid username or password.`; no token is generated on either failure.
-- `CreateUser` also adds a hard-coded second user. `UserProfile` copies `Password` directly into `PasswordHash`; hashing is not implemented. Never expose passwords or hashes in response DTOs.
-- `GetAllUsers` ignores `PageIndex` and `PageSize` and maps the entire query to a list. The existence of `PagedResult<T>` does not mean this endpoint paginates.
-- `GetUserByIdValidator` requires `UserId > 7`; update validation only checks a positive ID, and create validation checks username/email. Get-all and delete actions have no custom validation filter.
-- Get-by-ID throws `UserNotFoundException` for a missing user. Update and delete silently succeed when no user exists. Delete currently omits the cancellation token on its repository lookup.
-- All controller actions use `Ok(result)`. A failed `Result` alone does not cause transaction rollback. Do not serialize failed `Result<T>` objects directly: their `Value` getter throws. Account for HTTP status, serialization, and transaction behavior when introducing failure results.
-- `Program.cs` calls `MapOpenApi` in Development while `AddOpenApi` is commented out. Verify startup when changing API documentation setup. `UseAuthorization` is present, but authentication is not configured.
-
-## Build, Run, and Database Commands
-
-Run from the repository root with the .NET 10 SDK; there is no `global.json` pin:
+Run from the repository root with the .NET 10 SDK. The repository does not pin the SDK with `global.json`.
 
 ```powershell
 dotnet restore INuStore.slnx
@@ -74,38 +58,27 @@ dotnet test INuStore.slnx --no-build
 dotnet run --project src/INuStore.API --launch-profile https
 ```
 
-The HTTPS profile declares `https://localhost:7005` and `http://localhost:6000`; both launch profiles use Development. The `.http` examples use the HTTPS address. Swagger is configured at `/swagger/index.html`, and `/` redirects there. Coverage is optional:
+Both launch profiles use Development. The HTTPS profile declares `https://localhost:7005` and `http://localhost:6000`. The `.http` file targets HTTPS. Swagger UI is at `/swagger/index.html` and `/` redirects there. For optional coverage, run `dotnet test tests/INuStore.Tests --collect:"XPlat Code Coverage"`.
+
+Configure an accessible SQL Server instance through `ConnectionStrings:ConnectionStrings` or `ConnectionStrings__ConnectionStrings`. JWT settings are under `JwtOption`. Keep real credentials, signing keys, tokens, and hashes out of source, logs, and examples. EF detailed errors and sensitive-data logging are enabled in Infrastructure. Account for those settings when preparing non-development configuration. Serilog writes to the console and daily files under `logs/`.
+
+Use a `dotnet-ef` version matching the EF Core 10 packages and check `dotnet ef --version` before generating migrations. There is no repository-local tool manifest. Infrastructure owns migrations, API supplies startup configuration, and `ApplicationDbContext` owns the model. API startup leaves schema updates to explicit migration commands. See the [EF migration guide](technical-docs/5.ef-core-migrations.MD) for CLI and Package Manager Console.
 
 ```powershell
-dotnet test tests/INuStore.Tests --collect:"XPlat Code Coverage"
+dotnet ef migrations add DescribeSchemaChange --project src/INuStore.Infrastructure --startup-project src/INuStore.API --context ApplicationDbContext -- --environment Development
+dotnet ef database update --project src/INuStore.Infrastructure --startup-project src/INuStore.API --context ApplicationDbContext -- --environment Development
 ```
 
-For requested schema changes, use a `dotnet-ef` tool matching the EF Core 10 packages and target Infrastructure with API as the startup project. Replace `DescribeSchemaChange` with a descriptive migration name:
+Generate migrations for requested schema changes. Review the migration and snapshot together. Confirm the target database before applying the update. `Directory.Build.props` contains a temporary, advisory-specific AutoMapper audit suppression. Treat it as a tooling exception and retain all other dependency and security warnings.
 
-```powershell
-dotnet ef migrations add DescribeSchemaChange --project src/INuStore.Infrastructure --startup-project src/INuStore.API --context ApplicationDbContext
-dotnet ef database update --project src/INuStore.Infrastructure --startup-project src/INuStore.API --context ApplicationDbContext
-```
+## Editing, testing, and delivery
 
-There is no repository-local tool manifest. Check `dotnet ef --version` before generating migrations. Review generated migrations and the model snapshot together; apply database updates only to the intended configured database. The API does not apply migrations at startup.
+- Follow [the repository EditorConfig](.editorconfig), including four-space indentation, file-scoped namespaces, and braces on separate lines. Use PascalCase for types and public members, `I` prefixes for interfaces, camelCase for locals and parameters, and `_camelCase` for private fields. Nullable and implicit usings are enabled. Await I/O and propagate cancellation tokens.
+- Keep edits focused and preserve unrelated work. For features, update the owning contract, service, validation, mapping, controller, and DI registration as needed. Keep generated build output, logs, coverage, and test results out of source control.
+- Create, edit, or delete test files only when the user explicitly requests test changes. Verify implementation changes with a build and relevant existing tests. Build before running with `--no-build`. For documentation changes, check content, paths, and solution references.
+- The current test source has four architecture tests, three login tests, and one exception-middleware test. It uses mocks and an in-memory HTTP context. API startup, SQL Server connectivity, health endpoints, and transaction behavior need separate verification when relevant.
+- Report commands run, warnings, failures, and checks blocked by the environment. Use imperative commit subjects consistent with the repository. PRs should explain behavior, verification, and any configuration or migration changes. Include request and response examples for API changes.
 
-## Configuration and Security
+## Microsoft Learn MCP
 
-- Configure an accessible local SQL Server/LocalDB instance. The connection key is `ConnectionStrings:ConnectionStrings`; override it with `ConnectionStrings__ConnectionStrings`. The development settings contain a local example; keep real credentials out of source, logs, and examples.
-- `SqlServerRetryOptions` is validated on startup; retain valid settings when changing configuration.
-- EF detailed errors and sensitive-data logging are currently enabled in Infrastructure. Consider this when handling logs or preparing non-development configuration.
-- Serilog writes to console and daily files under `logs/`. Keep `bin/`, `obj/`, `.vs/`, logs, coverage, and test results untracked.
-
-## Editing, Testing, and Delivery
-
-Use four-space indentation, braces on separate lines, and the surrounding file's namespace style. Use PascalCase for types/public members, `I`-prefixed interfaces, camelCase locals/parameters, and `_camelCase` fields. Nullable and implicit usings are enabled. Await asynchronous I/O and pass cancellation tokens through new or changed operations. No repository-specific formatter or linter is configured.
-
-For a feature, update the versioned contracts, service interface/implementation, validators, mappings, controller, and DI registrations as needed. Put persistence/model changes in Infrastructure and Domain as appropriate. Keep edits focused and preserve unrelated user work.
-
-Do not write new tests or modify/delete existing test files unless the user explicitly requests test changes. Keep all existing test files as they are. Validate implementation changes with an appropriate build and, when relevant, run the existing test suite without changing it. Documentation-only edits need content/path checks rather than builds or tests.
-
-The existing suite contains four architecture tests, three `AuthService` login tests, one exception-middleware test, and three health-endpoint tests. The behavior tests use mocks, an in-memory HTTP context, or TestServer with fake health checks; they do not verify full API startup, real SQL Server connectivity, or transaction behavior. The health tests cover healthy/unhealthy readiness and liveness independent of the database, with a fallback authorization policy to verify anonymous access. No coverage percentage is enforced.
-
-Build before using `--no-build` tests. Report commands run, warnings/failures, and any checks blocked by the environment. Compilation and architecture tests do not establish working API startup or SQL Server behavior. Do not suppress dependency/security warnings to make validation look clean.
-
-Follow recent imperative commit subjects, such as `Add architecture tests to enforce layer boundaries`; Conventional Commit prefixes are not established. PRs should explain behavior changes, link relevant issues, report validation, identify configuration/migration changes, and include request/response examples for API changes.
+[The project MCP configuration](.codex/config.toml) registers `microsoft-learn` at `https://learn.microsoft.com/api/mcp`. Use it for official C#, .NET, ASP.NET Core, and EF Core references. Keep the configuration with the repository. After cloning, trust the project and reopen Codex to load it. Run `codex mcp list` from the repository root to check registration.

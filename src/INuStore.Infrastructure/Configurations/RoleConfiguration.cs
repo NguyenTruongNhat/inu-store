@@ -20,5 +20,13 @@ internal class RoleConfiguration : IEntityTypeConfiguration<Role>
             .IsRequired()
             .IsUnicode()
             .HasMaxLength(256);
+
+        // configure the relationship between Role and RolePermission
+        // A Role can have many RolePermissions
+        // if you dont configure in RolePermisionConfiguration, you need to configure it here
+        //builder.HasMany(role => role.RolePermissions)
+        //       .WithOne(link => link.Role)
+        //       .HasForeignKey(link => link.RoleId)
+        //       .OnDelete(DeleteBehavior.Cascade);
     }
 }

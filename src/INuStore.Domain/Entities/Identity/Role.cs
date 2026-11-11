@@ -9,5 +9,6 @@ public class Role : DomainEntity<int>
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
+    public List<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();
 
 }

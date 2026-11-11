@@ -6,4 +6,6 @@ internal static class TableNames
     internal const string Users = nameof(Users);
     internal const string Roles = nameof(Roles);
     internal const string UserRoles = nameof(UserRoles);
+    internal const string RolePermissions = nameof(RolePermissions);
+    internal const string Permissions = nameof(Permissions);
 }

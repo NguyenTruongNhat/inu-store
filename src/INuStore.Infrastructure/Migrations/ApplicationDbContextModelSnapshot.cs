@@ -21,6 +21,29 @@ namespace INuStore.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("INuStore.Domain.Entities.Identity.Permission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Permissions", (string)null);
+                });
+
             modelBuilder.Entity("INuStore.Domain.Entities.Identity.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -45,6 +68,29 @@ namespace INuStore.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Roles", (string)null);
+                });
+
+            modelBuilder.Entity("INuStore.Domain.Entities.Identity.RolePermission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PermissionId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("RolePermissions", (string)null);
                 });
 
             modelBuilder.Entity("INuStore.Domain.Entities.Identity.User", b =>
@@ -90,6 +136,25 @@ namespace INuStore.Infrastructure.Migrations
                     b.ToTable("UserRoles", (string)null);
                 });
 
+            modelBuilder.Entity("INuStore.Domain.Entities.Identity.RolePermission", b =>
+                {
+                    b.HasOne("INuStore.Domain.Entities.Identity.Permission", "Permission")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("INuStore.Domain.Entities.Identity.Role", "Role")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("INuStore.Domain.Entities.Identity.UserRole", b =>
                 {
                     b.HasOne("INuStore.Domain.Entities.Identity.Role", "Role")
@@ -109,8 +174,15 @@ namespace INuStore.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("INuStore.Domain.Entities.Identity.Permission", b =>
+                {
+                    b.Navigation("RolePermissions");
+                });
+
             modelBuilder.Entity("INuStore.Domain.Entities.Identity.Role", b =>
                 {
+                    b.Navigation("RolePermissions");
+
                     b.Navigation("UserRoles");
                 });
 

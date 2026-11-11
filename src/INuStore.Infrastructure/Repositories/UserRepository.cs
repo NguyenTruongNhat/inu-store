@@ -13,10 +13,12 @@ public sealed class UserRepository : RepositoryBase<User, int>, IUserRepository
         _context = context;
     }
 
-    public async Task<User?> GetUserByUserNameAsync(string userName, CancellationToken cancellationToken = default)
-    {
-        return await FindSingleAsync(user => user.UserName == userName, cancellationToken);
-    }
+    public Task<User?> GetUserByUserNameAsync(string userName, CancellationToken cancellationToken = default)
+        => _context.Users
+            .AsTracking()
+            .Include(user => user.UserRoles)
+                .ThenInclude(userRole => userRole.Role)
+            .SingleOrDefaultAsync(user => user.UserName == userName, cancellationToken);
 
     public Task<User?> GetUserWithRolesAsync(int userId, CancellationToken cancellationToken = default)
     {

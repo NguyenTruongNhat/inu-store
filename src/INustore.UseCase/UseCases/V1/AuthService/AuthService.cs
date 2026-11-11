@@ -5,10 +5,7 @@ using INuStore.UseCase.Exceptions;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.Auth;
 using INuStore.Domain.Entities.Identity;
-using System;
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Text;
 
 namespace INuStore.UseCase.UseCases.V1.AuthService;
 
@@ -52,12 +49,18 @@ public class AuthService : IAuthService
 
     private List<Claim> BuildClaim(User user)
     {
-        return new List<Claim>
+        var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.UserName),
             new Claim(ClaimTypes.Email, user.Email),
-            // Add more claims as needed
         };
+
+        foreach (var userRole in user.UserRoles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
+        }
+
+        return claims;
     }
 }

@@ -4,6 +4,8 @@
 @pageIndex = 1
 @pageSize = 10
 @accessToken = replace-with-access-token
+@adminAccessToken = replace-with-admin-access-token
+@managerAccessToken = replace-with-manager-access-token
 @roleId = 6
 
 ### Liveness: API is responding without checking SQL Server
@@ -142,15 +144,23 @@ Authorization: Bearer {{accessToken}}
 DELETE {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/{{userId}}/roles/0
 Authorization: Bearer {{accessToken}}
 
-### Get all roles (log in and set accessToken above)
+### Get all roles (log in as a user with the Admin role)
 GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/GetAllRoles
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{adminAccessToken}}
 Accept: application/json
 
-### Get a role by ID (set roleId to an existing custom role)
+### Get a role by ID (log in as a user with the Manager role and use an existing role ID)
 GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/GetRoleById?RoleId={{roleId}}
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{managerAccessToken}}
 Accept: application/json
+
+### Manager without Admin: HTTP 403
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/GetAllRoles
+Authorization: Bearer {{managerAccessToken}}
+
+### Admin without Manager: HTTP 403
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/GetRoleById?RoleId={{roleId}}
+Authorization: Bearer {{adminAccessToken}}
 
 ### Create a custom role (repeat to verify HTTP 400 for a duplicate name)
 POST {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/CreateRole
@@ -184,11 +194,11 @@ Content-Type: application/json
 
 ### Missing role: HTTP 404
 GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/GetRoleById?RoleId=2147483647
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{managerAccessToken}}
 
 ### Invalid role ID: HTTP 400
 GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/GetRoleById?RoleId=0
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{managerAccessToken}}
 
 ### Missing access token: HTTP 401
 GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/GetAllRoles

@@ -2,6 +2,7 @@ using INuStore.UseCase.Abstractions.Services;
 using INuStore.API.Filters;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.Role;
+using INuStore.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,12 +16,14 @@ public class RoleController(IRoleService roleService) : ApiController
 {
     /// <summary>Returns all roles ordered by identifier.</summary>
     [HttpGet("GetAllRoles")]
-    [ProducesResponseType(typeof(Result<Response.GetAllRolesResponse>), StatusCodes.Status200OK)]
+    [Authorize(Roles = nameof(RoleType.Admin))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetAllRoles(CancellationToken cancellationToken = default)
         => Ok(await roleService.GetAllRoles(cancellationToken));
 
     /// <summary>Returns a role by identifier.</summary>
     [HttpGet("GetRoleById")]
+    [Authorize(Roles = nameof(RoleType.Manager))]
     [Validate<Query.GetRoleById>]
     [ProducesResponseType(typeof(Result<Response.GetRoleByIdResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetRoleById([FromQuery] Query.GetRoleById request, CancellationToken cancellationToken = default)

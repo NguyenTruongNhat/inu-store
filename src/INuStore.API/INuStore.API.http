@@ -7,6 +7,7 @@
 @adminAccessToken = replace-with-admin-access-token
 @managerAccessToken = replace-with-manager-access-token
 @roleId = 6
+@permissionId = 1
 
 ### Liveness: API is responding without checking SQL Server
 GET {{INuStore.API_HostAddress}}/health/live
@@ -202,3 +203,56 @@ Authorization: Bearer {{managerAccessToken}}
 
 ### Missing access token: HTTP 401
 GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/GetAllRoles
+
+### Create a permission (repeat for HTTP 400)
+POST {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Permission/CreatePermission
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "name": "orders.read",
+  "description": "View customer orders."
+}
+
+### List permissions and use the returned ID for the requests below
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Permission/GetAllPermissions
+Authorization: Bearer {{adminAccessToken}}
+
+### Read a permission
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Permission/GetPermissionById?permissionId={{permissionId}}
+Authorization: Bearer {{adminAccessToken}}
+
+### Update a permission
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Permission/UpdatePermission
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "permissionId": {{permissionId}},
+  "name": "orders.view",
+  "description": null
+}
+
+### Delete an unassigned permission
+DELETE {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Permission/DeletePermission
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "permissionId": {{permissionId}}
+}
+
+### Missing permission: HTTP 404
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Permission/GetPermissionById?permissionId=2147483647
+Authorization: Bearer {{adminAccessToken}}
+
+### Invalid ID: HTTP 400
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Permission/GetPermissionById?permissionId=0
+Authorization: Bearer {{adminAccessToken}}
+
+### Missing token: HTTP 401
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Permission/GetAllPermissions
+
+### Manager without Admin: HTTP 403
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Permission/GetAllPermissions
+Authorization: Bearer {{managerAccessToken}}

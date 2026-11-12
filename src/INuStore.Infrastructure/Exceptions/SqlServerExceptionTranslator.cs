@@ -10,6 +10,8 @@ internal static class SqlServerExceptionTranslator
 {
     private const string RoleNameIndex = "IX_Roles_Name";
     private const string RoleAssignmentForeignKey = "FK_UserRoles_Roles_RoleId";
+    private const string PermissionNameIndex = "IX_Permissions_Name";
+    private const string PermissionAssignmentForeignKey = "FK_RolePermissions_Permissions_PermissionId";
 
     /// <summary>Returns a domain error for a recognized constraint violation, otherwise null.</summary>
     /// <param name="exception">The failed EF Core save, retained as the translated error's inner exception.</param>
@@ -34,6 +36,16 @@ internal static class SqlServerExceptionTranslator
             {
                 return new RoleException.RoleAssignedException(exception);
             }
+
+            if (IsDuplicatePermissionName(error, exception))
+            {
+                return new PermissionException.DuplicatePermissionNameException(exception);
+            }
+
+            if (IsAssignedPermissionDeletion(error, exception))
+            {
+                return new PermissionException.PermissionAssignedException(exception);
+            }
         }
 
         return null;
@@ -49,4 +61,15 @@ internal static class SqlServerExceptionTranslator
         => error.Number == 547
             && error.Message.Contains($"\"{RoleAssignmentForeignKey}\"", StringComparison.Ordinal)
             && exception.Entries.Any(entry => entry.Entity is Role && entry.State == EntityState.Deleted);
+
+    private static bool IsDuplicatePermissionName(SqlError error, DbUpdateException exception)
+        => error.Number is 2601 or 2627
+            && error.Message.Contains($"'{PermissionNameIndex}'", StringComparison.Ordinal)
+            && exception.Entries.Any(entry => entry.Entity is Permission
+                && entry.State is EntityState.Added or EntityState.Modified);
+
+    private static bool IsAssignedPermissionDeletion(SqlError error, DbUpdateException exception)
+        => error.Number == 547
+            && error.Message.Contains($"\"{PermissionAssignmentForeignKey}\"", StringComparison.Ordinal)
+            && exception.Entries.Any(entry => entry.Entity is Permission && entry.State == EntityState.Deleted);
 }

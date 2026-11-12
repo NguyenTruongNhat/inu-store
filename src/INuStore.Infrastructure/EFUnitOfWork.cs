@@ -1,4 +1,4 @@
-﻿using INuStore.UseCase.Abstractions.Repositories;
+using INuStore.UseCase.Abstractions.Repositories;
 using INuStore.UseCase.Abstractions.UnitOfWork;
 using INuStore.Infrastructure.Exceptions;
 using Microsoft.EntityFrameworkCore;
@@ -11,12 +11,16 @@ public class EFUnitOfWork : IUnitOfWork
 
     public IUserRepository UserRepository { get; }
     public IRoleRepository RoleRepository { get; }
+    /// <inheritdoc />
+    public IPermissionRepository PermissionRepository { get; }
 
-    public EFUnitOfWork(ApplicationDbContext context, IUserRepository userRepository, IRoleRepository roleRepository)
+    public EFUnitOfWork(ApplicationDbContext context, IUserRepository userRepository, IRoleRepository roleRepository,
+        IPermissionRepository permissionRepository)
     {
         _context = context;
         UserRepository = userRepository;
         RoleRepository = roleRepository;
+        PermissionRepository = permissionRepository;
     }
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)

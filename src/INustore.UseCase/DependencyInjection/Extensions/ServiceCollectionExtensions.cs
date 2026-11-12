@@ -1,8 +1,9 @@
-﻿using FluentValidation;
+using FluentValidation;
 using INuStore.UseCase.Abstractions.Services;
 using INuStore.UseCase.UseCases.V1.AuthService;
 using INuStore.UseCase.UseCases.V1.UserService;
 using INuStore.UseCase.UseCases.V1.RoleService;
+using INuStore.UseCase.UseCases.V1.PermissionService;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace INuStore.UseCase.DependencyInjection.Extensions;
@@ -21,6 +22,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddAppServices(this IServiceCollection services)
     => services.AddScoped<IUserService, UserService>()
                .AddScoped<IRoleService, RoleService>()
+               .AddScoped<IPermissionService, PermissionService>()
                .AddTransient<IAuthService, AuthService>()
                ;
 

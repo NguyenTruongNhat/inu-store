@@ -86,7 +86,7 @@ Mục tiêu: Xây dựng hệ thống xác thực an toàn.
 Mục tiêu: Ôn tập authorization, policy-based authorization và quan hệ many-to-many.
 
 - [x] **4.1** CRUD Role.
-- [ ] **4.2** CRUD Permission.
+- [x] **4.2** CRUD Permission.
 - [x] **4.3** Gán nhiều Role cho User.
 - [x] **4.4** Thu hồi Role khỏi User.
 - [ ] **4.5** Gán nhiều Permission cho Role.

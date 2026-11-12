@@ -1,4 +1,4 @@
-﻿using INuStore.Domain.Entities.Identity;
+using INuStore.Domain.Entities.Identity;
 using INuStore.Infrastructure.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -15,6 +15,8 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
             .IsRequired()
             .IsUnicode()
             .HasMaxLength(256);
+
+        builder.HasIndex(x => x.Name).IsUnique();
 
         // Configure the relationship between Permission and RolePermission
         // A Permission can have many RolePermissions

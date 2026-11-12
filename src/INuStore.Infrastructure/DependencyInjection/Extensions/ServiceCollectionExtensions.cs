@@ -1,4 +1,4 @@
-﻿using INuStore.UseCase.Abstractions.Repositories;
+using INuStore.UseCase.Abstractions.Repositories;
 using INuStore.UseCase.Abstractions.Security;
 using INuStore.UseCase.Abstractions.UnitOfWork;
 using INuStore.Domain.Entities.Identity;
@@ -118,6 +118,7 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IRoleRepository, RoleRepository>();
+        services.AddTransient<IPermissionRepository, PermissionRepository>();
 
     }
 

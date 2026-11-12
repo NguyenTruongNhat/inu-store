@@ -41,6 +41,9 @@ namespace INuStore.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Permissions", (string)null);
                 });
 
@@ -141,7 +144,7 @@ namespace INuStore.Infrastructure.Migrations
                     b.HasOne("INuStore.Domain.Entities.Identity.Permission", "Permission")
                         .WithMany("RolePermissions")
                         .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("INuStore.Domain.Entities.Identity.Role", "Role")

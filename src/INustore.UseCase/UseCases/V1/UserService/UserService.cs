@@ -122,7 +122,6 @@ public class UserService : IUserService
         return Result.Success();
     }
 
-    /// <inheritdoc />
     public async Task<Result> ReplaceUserRoles(int userId, Command.ReplaceUserRoles request, CancellationToken cancellationToken = default)
     {
         //#avoiding-dbcontext-threading-issues

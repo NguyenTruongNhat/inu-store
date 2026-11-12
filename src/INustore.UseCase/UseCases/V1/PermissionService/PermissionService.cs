@@ -9,20 +9,17 @@ using INuStore.Domain.Exceptions;
 
 namespace INuStore.UseCase.UseCases.V1.PermissionService;
 
-/// <summary>Applies permission rules without taking ownership of saving or committing changes.</summary>
 public sealed class PermissionService(IUnitOfWork unitOfWork, IMapper mapper) : IPermissionService
 {
     private readonly IPermissionRepository _permissionRepository = unitOfWork.PermissionRepository;
 
-    /// <inheritdoc />
     public async Task<Result<Response.GetAllPermissionsResponse>> GetAllPermissions(CancellationToken cancellationToken = default)
     {
-        var permissions = await _permissionRepository.GetAllOrderedByIdAsync(cancellationToken);
+        var permissions = await _permissionRepository.GetAllAsync(cancellationToken);
         var permissionResponses = mapper.Map<List<Response.PermissionResponse>>(permissions);
         return Result.Success(new Response.GetAllPermissionsResponse(permissionResponses));
     }
 
-    /// <inheritdoc />
     public async Task<Result<Response.GetPermissionByIdResponse>> GetPermissionById(Query.GetPermissionById request, CancellationToken cancellationToken = default)
     {
         var permission = await GetRequiredPermissionAsync(request.PermissionId, cancellationToken);
@@ -30,7 +27,6 @@ public sealed class PermissionService(IUnitOfWork unitOfWork, IMapper mapper) : 
         return Result.Success(new Response.GetPermissionByIdResponse(permissionResponse));
     }
 
-    /// <inheritdoc />
     public async Task<Result> CreatePermission(Command.CreatePermission request, CancellationToken cancellationToken = default)
     {
         var permissionName = request.Name.Trim();
@@ -46,7 +42,6 @@ public sealed class PermissionService(IUnitOfWork unitOfWork, IMapper mapper) : 
         return Result.Success();
     }
 
-    /// <inheritdoc />
     public async Task<Result> UpdatePermission(Command.UpdatePermission request, CancellationToken cancellationToken = default)
     {
         var permission = await GetRequiredPermissionAsync(request.PermissionId, cancellationToken);
@@ -59,7 +54,6 @@ public sealed class PermissionService(IUnitOfWork unitOfWork, IMapper mapper) : 
         return Result.Success();
     }
 
-    /// <inheritdoc />
     public async Task<Result> DeletePermission(Command.DeletePermission request, CancellationToken cancellationToken = default)
     {
         var permission = await GetRequiredPermissionAsync(request.PermissionId, cancellationToken);

@@ -14,7 +14,6 @@ namespace INuStore.Infrastructure.Migrations
     [Migration("20261109132818_ProtectRoleNamesAndAssignments")]
     partial class ProtectRoleNamesAndAssignments
     {
-        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618

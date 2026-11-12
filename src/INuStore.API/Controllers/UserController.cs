@@ -22,7 +22,6 @@ public class UserController : ApiController
     [HttpGet("GetUserById")]
     [Validate<Query.GetUserById>]
     [ProducesResponseType(typeof(Result<Response.GetUserByIdResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserById([FromQuery] Query.GetUserById request, CancellationToken cancellationToken = default)
     {
         var response = await _userService.GetUserById(request, cancellationToken);
@@ -64,9 +63,6 @@ public class UserController : ApiController
     [Authorize]
     [HttpGet("{userId:int}/roles")]
     [ProducesResponseType(typeof(Result<Response.GetUserRolesResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserRoles([FromRoute, Range(1, int.MaxValue)] int userId, CancellationToken cancellationToken = default)
     {
         var result = await _userService.GetUserRoles(userId, cancellationToken);
@@ -79,9 +75,6 @@ public class UserController : ApiController
     [Validate<Request.UserRolesRoute>]
     [Validate<Command.ReplaceUserRoles>]
     [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ReplaceUserRoles(
         [FromRoute] Request.UserRolesRoute route,
         [FromBody] Command.ReplaceUserRoles request,
@@ -95,9 +88,6 @@ public class UserController : ApiController
     [HttpPut("{userId:int}/roles/{roleId:int}")]
     [Validate<Command.AssignRoleToUser>]
     [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AssignRoleToUser(
         [FromRoute] Command.AssignRoleToUser request,
         CancellationToken cancellationToken = default)
@@ -110,9 +100,6 @@ public class UserController : ApiController
     [HttpDelete("{userId:int}/roles/{roleId:int}")]
     [Validate<Command.RemoveRoleFromUser>]
     [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RemoveRoleFromUser(
         [FromRoute] Command.RemoveRoleFromUser request,
         CancellationToken cancellationToken = default)

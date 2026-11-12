@@ -3,10 +3,8 @@ using INuStore.Contract.Service.V1.User;
 
 namespace INuStore.UseCase.UseCases.V1.UserService.Validators;
 
-/// <summary>Validates the user identifier for replacing role assignments.</summary>
 public sealed class UserRolesRouteValidator : AbstractValidator<Request.UserRolesRoute>
 {
-    /// <summary>Requires a positive user identifier.</summary>
     public UserRolesRouteValidator()
     {
         RuleFor(request => request.UserId)
@@ -14,10 +12,8 @@ public sealed class UserRolesRouteValidator : AbstractValidator<Request.UserRole
     }
 }
 
-/// <summary>Validates the complete replacement list of role identifiers.</summary>
 public sealed class ReplaceUserRolesValidator : AbstractValidator<Command.ReplaceUserRoles>
 {
-    /// <summary>Requires at least one role and positive identifiers.</summary>
     public ReplaceUserRolesValidator()
     {
         RuleFor(request => request.RoleIds)
@@ -27,10 +23,8 @@ public sealed class ReplaceUserRolesValidator : AbstractValidator<Command.Replac
     }
 }
 
-/// <summary>Validates the route identifiers for assigning a role.</summary>
 public sealed class AssignRoleToUserValidator : AbstractValidator<Command.AssignRoleToUser>
 {
-    /// <summary>Requires positive user and role identifiers.</summary>
     public AssignRoleToUserValidator()
     {
         RuleFor(request => request.UserId)
@@ -40,10 +34,8 @@ public sealed class AssignRoleToUserValidator : AbstractValidator<Command.Assign
     }
 }
 
-/// <summary>Validates the route identifiers for removing a role assignment.</summary>
 public sealed class RemoveRoleFromUserValidator : AbstractValidator<Command.RemoveRoleFromUser>
 {
-    /// <summary>Requires positive user and role identifiers.</summary>
     public RemoveRoleFromUserValidator()
     {
         RuleFor(request => request.UserId)

@@ -13,7 +13,6 @@ public interface IUserService
     Task<Result<Response.GetUserRolesResponse>> GetUserRoles(int userId, CancellationToken cancellationToken = default);
     Task<Result> AssignRoleToUser(Command.AssignRoleToUser request, CancellationToken cancellationToken = default);
     Task<Result> RemoveRoleFromUser(Command.RemoveRoleFromUser request, CancellationToken cancellationToken = default);
-    /// <summary>Replaces all role assignments after verifying that every requested role exists.</summary>
     Task<Result> ReplaceUserRoles(int userId, Command.ReplaceUserRoles request, CancellationToken cancellationToken = default);
 
 }

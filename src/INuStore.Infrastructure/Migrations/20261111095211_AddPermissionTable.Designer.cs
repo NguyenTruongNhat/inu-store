@@ -14,7 +14,6 @@ namespace INuStore.Infrastructure.Migrations
     [Migration("20261111095211_AddPermissionTable")]
     partial class AddPermissionTable
     {
-        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618

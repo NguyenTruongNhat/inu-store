@@ -14,7 +14,6 @@ namespace INuStore.Infrastructure.Migrations
     [Migration("20261104150510_CreateRoleTable")]
     partial class CreateRoleTable
     {
-        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618

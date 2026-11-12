@@ -4,10 +4,8 @@
 
 namespace INuStore.Infrastructure.Migrations;
 
-/// <inheritdoc />
 public partial class ProtectPermissionNamesAndAssignments : Migration
 {
-    /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropForeignKey(
@@ -28,7 +26,6 @@ public partial class ProtectPermissionNamesAndAssignments : Migration
             principalColumn: "Id");
     }
 
-    /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropForeignKey(

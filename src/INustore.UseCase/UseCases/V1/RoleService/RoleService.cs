@@ -9,24 +9,20 @@ using INuStore.Domain.Exceptions;
 
 namespace INuStore.UseCase.UseCases.V1.RoleService;
 
-/// <summary>Applies role rules without taking ownership of saving or committing changes.</summary>
 public sealed class RoleService(IUnitOfWork unitOfWork, IMapper mapper) : IRoleService
 {
-    /// <inheritdoc />
     public async Task<Result<Response.GetAllRolesResponse>> GetAllRoles(CancellationToken cancellationToken = default)
     {
         var roles = await unitOfWork.RoleRepository.GetAllAsync(cancellationToken);
         return Result.Success(new Response.GetAllRolesResponse(mapper.Map<List<Response.RoleResponse>>(roles)));
     }
 
-    /// <inheritdoc />
     public async Task<Result<Response.GetRoleByIdResponse>> GetRoleById(Query.GetRoleById request, CancellationToken cancellationToken = default)
     {
         var role = await FindRoleAsync(request.RoleId, cancellationToken);
         return Result.Success(new Response.GetRoleByIdResponse(mapper.Map<Response.RoleResponse>(role)));
     }
 
-    /// <inheritdoc />
     public async Task<Result> CreateRole(Command.CreateRole request, CancellationToken cancellationToken = default)
     {
         var name = request.Name.Trim();
@@ -41,7 +37,6 @@ public sealed class RoleService(IUnitOfWork unitOfWork, IMapper mapper) : IRoleS
         return Result.Success();
     }
 
-    /// <inheritdoc />
     public async Task<Result> UpdateRole(Command.UpdateRole request, CancellationToken cancellationToken = default)
     {
         var role = await FindRoleAsync(request.RoleId, cancellationToken);
@@ -59,7 +54,6 @@ public sealed class RoleService(IUnitOfWork unitOfWork, IMapper mapper) : IRoleS
         return Result.Success();
     }
 
-    /// <inheritdoc />
     public async Task<Result> DeleteRole(Command.DeleteRole request, CancellationToken cancellationToken = default)
     {
         var role = await FindRoleAsync(request.RoleId, cancellationToken);

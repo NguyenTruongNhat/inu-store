@@ -11,7 +11,6 @@ public class EFUnitOfWork : IUnitOfWork
 
     public IUserRepository UserRepository { get; }
     public IRoleRepository RoleRepository { get; }
-    /// <inheritdoc />
     public IPermissionRepository PermissionRepository { get; }
 
     public EFUnitOfWork(ApplicationDbContext context, IUserRepository userRepository, IRoleRepository roleRepository,

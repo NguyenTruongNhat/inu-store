@@ -86,8 +86,6 @@ public static class ServiceCollectionExtensions
         });
     }
 
-    /// <summary>Registers the SQL Server connectivity health check.</summary>
-    /// <param name="services">The application's service collection.</param>
     public static void AddHealthCheckConfiguration(this IServiceCollection services)
     {
         services.AddHealthChecks()

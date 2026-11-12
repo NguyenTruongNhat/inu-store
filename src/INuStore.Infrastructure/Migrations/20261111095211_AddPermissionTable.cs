@@ -4,10 +4,8 @@
 
 namespace INuStore.Infrastructure.Migrations
 {
-    /// <inheritdoc />
     public partial class AddPermissionTable : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -61,7 +59,6 @@ namespace INuStore.Infrastructure.Migrations
                 column: "RoleId");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

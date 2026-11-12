@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace INuStore.Infrastructure.Exceptions;
 
-/// <summary>Translates known SQL Server constraint violations into safe domain errors.</summary>
 internal static class SqlServerExceptionTranslator
 {
     private const string RoleNameIndex = "IX_Roles_Name";
@@ -13,9 +12,6 @@ internal static class SqlServerExceptionTranslator
     private const string PermissionNameIndex = "IX_Permissions_Name";
     private const string PermissionAssignmentForeignKey = "FK_RolePermissions_Permissions_PermissionId";
 
-    /// <summary>Returns a domain error for a recognized constraint violation, otherwise null.</summary>
-    /// <param name="exception">The failed EF Core save, retained as the translated error's inner exception.</param>
-    /// <returns>A safe domain exception, or null when the original exception should propagate.</returns>
     internal static DomainException? Translate(DbUpdateException exception)
     {
         if (exception.InnerException is not SqlException sqlException)

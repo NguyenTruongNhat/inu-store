@@ -37,6 +37,7 @@
     <File Path="technical-docs/6.exception-handling-middleware.MD" />
     <File Path="technical-docs/7.sql-server-exception-translation-and-unit-of-work.MD" />
     <File Path="technical-docs/8.deploy-sql-server-migrations.MD" />
+    <File Path="technical-docs/9.ef-core-migration-walkthrough.MD" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/INuStore.API/INuStore.API.csproj" />

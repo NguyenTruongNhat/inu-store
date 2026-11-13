@@ -71,6 +71,38 @@ namespace INuStore.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Admin for the Store",
+                            Name = "Admin"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Customer for the Store",
+                            Name = "Customer"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Manager for the Store",
+                            Name = "Manager"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "Shipper for the Store",
+                            Name = "Shipper"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Staff for the Store",
+                            Name = "Staff"
+                        });
                 });
 
             modelBuilder.Entity("INuStore.Domain.Entities.Identity.RolePermission", b =>

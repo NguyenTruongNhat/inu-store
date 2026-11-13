@@ -1,4 +1,5 @@
 ﻿using INuStore.Domain.Entities.Identity;
+using INuStore.Domain.Enums;
 using INuStore.Infrastructure.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -20,6 +21,13 @@ internal class RoleConfiguration : IEntityTypeConfiguration<Role>
             .IsRequired()
             .IsUnicode()
             .HasMaxLength(256);
+
+        builder.HasData(RoleType.List.Select(roleType => new Role
+        {
+            Id = roleType.Value,
+            Name = roleType.Name,
+            Description = roleType.Description
+        }));
 
         // configure the relationship between Role and RolePermission
         // A Role can have many RolePermissions

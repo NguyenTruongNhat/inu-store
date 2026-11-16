@@ -89,9 +89,9 @@ Mục tiêu: Ôn tập authorization, policy-based authorization và quan hệ m
 - [x] **4.2** CRUD Permission.
 - [x] **4.3** Gán nhiều Role cho User.
 - [x] **4.4** Thu hồi Role khỏi User.
-- [ ] **4.5** Gán nhiều Permission cho Role.
-- [ ] **4.6** Thu hồi Permission khỏi Role.
-- [ ] **4.7** Xem danh sách Permission của User.
+- [x] **4.5** Gán nhiều Permission cho Role.
+- [x] **4.6** Thu hồi Permission khỏi Role.
+- [x] **4.7** Xem danh sách Permission của User.
 - [x] **4.8** Kiểm tra quyền truy cập theo Role.
 - [ ] **4.9** Kiểm tra quyền truy cập theo Permission.
 - [ ] **4.10** Xây dựng custom Authorization Policy.

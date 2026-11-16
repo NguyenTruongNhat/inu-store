@@ -256,3 +256,44 @@ GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Permission/GetAllPermission
 ### Manager without Admin: HTTP 403
 GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Permission/GetAllPermissions
 Authorization: Bearer {{managerAccessToken}}
+
+### Assign permissions to a role (Admin, additive and safe to repeat)
+PATCH {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/{{roleId}}/permissions
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{ "permissionIds": [1, 2, 2] }
+
+### Assign permissions with an unknown ID (404, no changes)
+PATCH {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/{{roleId}}/permissions
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{ "permissionIds": [1, 2147483647] }
+
+### Revoke a permission from a role (Admin)
+DELETE {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/{{roleId}}/permissions/{{permissionId}}
+Authorization: Bearer {{adminAccessToken}}
+
+### Get the user's effective permissions (Admin)
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/{{userId}}/permissions
+Authorization: Bearer {{adminAccessToken}}
+
+### Get permissions for an unknown user (404)
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/2147483647/permissions
+Authorization: Bearer {{adminAccessToken}}
+
+### Invalid Role ID when assigning permissions (400)
+PATCH {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/0/permissions
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{ "permissionIds": [1] }
+
+### Invalid Permission ID when revoking a permission (400)
+DELETE {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Role/{{roleId}}/permissions/0
+Authorization: Bearer {{adminAccessToken}}
+
+### Invalid User ID when reading permissions (400)
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/0/permissions
+Authorization: Bearer {{adminAccessToken}}

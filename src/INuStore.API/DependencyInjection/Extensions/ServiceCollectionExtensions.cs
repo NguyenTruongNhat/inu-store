@@ -1,4 +1,4 @@
-﻿using ApiGateway.DependencyInjection.Extensions;
+using ApiGateway.DependencyInjection.Extensions;
 using INuStore.API.Middlewares;
 using Microsoft.AspNetCore.Mvc.Versioning;
 
@@ -12,6 +12,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<TransactionMiddleware>();
 
         services.AddControllers();
+        services.AddOpenApi();
         services.AddApiVersioning(options =>
         {
             options.ApiVersionReader = new UrlSegmentApiVersionReader();

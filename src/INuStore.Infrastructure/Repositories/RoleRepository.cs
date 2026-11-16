@@ -23,6 +23,19 @@ public sealed class RoleRepository : RepositoryBase<Role, int>, IRoleRepository
         => FindAll(role => role.Name == name && (!excludedRoleId.HasValue || role.Id != excludedRoleId.Value))
             .AnyAsync(cancellationToken);
 
+    // TODO: Improve concurrency handling when requests change permissions for the same role.
+    //.FromSql($"SELECT * FROM [Roles] WITH (UPDLOCK, HOLDLOCK) WHERE [Id] = {roleId}")
+    public Task<Role?> GetRoleForPermissionUpdateAsync(int roleId, CancellationToken cancellationToken = default)
+        => _context.Roles
+            .Include(role => role.RolePermissions)
+            .SingleOrDefaultAsync(role => role.Id == roleId, cancellationToken);
+
+    public void AddPermissionAssignment(RolePermission assignment)
+        => _context.Set<RolePermission>().Add(assignment);
+
+    public void RemovePermissionAssignment(RolePermission assignment)
+        => _context.Set<RolePermission>().Remove(assignment);
+
     public Task<bool> HasAssignmentsAsync(int roleId, CancellationToken cancellationToken = default)
         => _context.UserRoles.AnyAsync(assignment => assignment.RoleId == roleId, cancellationToken);
 }

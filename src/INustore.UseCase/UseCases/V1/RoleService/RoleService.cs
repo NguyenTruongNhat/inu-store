@@ -71,6 +71,49 @@ public sealed class RoleService(IUnitOfWork unitOfWork, IMapper mapper) : IRoleS
         return Result.Success();
     }
 
+    public async Task<Result> AssignPermissions(int roleId, Command.AssignPermissions request, CancellationToken cancellationToken = default)
+    {
+        var role = await GetRoleForPermissionUpdateAsync(roleId, cancellationToken);
+        var requestedIds = request.PermissionIds.Distinct().ToArray();
+        var existingIds = await unitOfWork.PermissionRepository.GetExistingIdsAsync(requestedIds, cancellationToken);
+
+        foreach (var missingId in requestedIds.Except(existingIds))
+        {
+            throw new PermissionException.PermissionNotFoundException(missingId);
+        }
+
+        var assignedIds = role.RolePermissions.Select(assignment => assignment.PermissionId);
+        foreach (var permissionId in requestedIds.Except(assignedIds))
+        {
+            unitOfWork.RoleRepository.AddPermissionAssignment(new RolePermission
+            {
+                RoleId = role.Id,
+                PermissionId = permissionId
+            });
+        }
+
+        return Result.Success();
+    }
+
+    public async Task<Result> RevokePermission(int roleId, int permissionId, CancellationToken cancellationToken = default)
+    {
+        var role = await GetRoleForPermissionUpdateAsync(roleId, cancellationToken);
+        _ = await unitOfWork.PermissionRepository.FindByIdAsync(permissionId, cancellationToken)
+            ?? throw new PermissionException.PermissionNotFoundException(permissionId);
+
+        var assignment = role.RolePermissions.SingleOrDefault(assignment => assignment.PermissionId == permissionId);
+        if (assignment is not null)
+        {
+            unitOfWork.RoleRepository.RemovePermissionAssignment(assignment);
+        }
+
+        return Result.Success();
+    }
+
+    private async Task<Role> GetRoleForPermissionUpdateAsync(int roleId, CancellationToken cancellationToken)
+        => await unitOfWork.RoleRepository.GetRoleForPermissionUpdateAsync(roleId, cancellationToken)
+            ?? throw new RoleException.RoleNotFoundException(roleId);
+
     private async Task<Role> FindRoleAsync(int roleId, CancellationToken cancellationToken)
         => await unitOfWork.RoleRepository.FindByIdAsync(roleId, cancellationToken)
             ?? throw new RoleException.RoleNotFoundException(roleId);

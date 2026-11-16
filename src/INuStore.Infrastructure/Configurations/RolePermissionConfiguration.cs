@@ -11,6 +11,8 @@ public class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermissi
     {
         builder.ToTable(TableNames.RolePermissions);
         builder.HasKey(x => x.Id);
+        builder.HasIndex(assignment => new { assignment.RoleId, assignment.PermissionId })
+            .IsUnique();
 
         builder.HasOne(rp => rp.Role)
             .WithMany(r => r.RolePermissions)

@@ -1,10 +1,10 @@
-﻿using INuStore.UseCase.Abstractions.Services;
+using INuStore.UseCase.Abstractions.Services;
 using INuStore.API.Filters;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.User;
+using INuStore.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace INuStore.API.Controllers;
 
@@ -62,21 +62,31 @@ public class UserController : ApiController
 
     [Authorize]
     [HttpGet("{userId:int}/roles")]
+    [Validate<Request.UserIdRoute>]
     [ProducesResponseType(typeof(Result<Response.GetUserRolesResponse>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetUserRoles([FromRoute, Range(1, int.MaxValue)] int userId, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetUserRoles([FromRoute] Request.UserIdRoute route, CancellationToken cancellationToken = default)
     {
-        var result = await _userService.GetUserRoles(userId, cancellationToken);
+        var result = await _userService.GetUserRoles(route.UserId, cancellationToken);
 
         return Ok(result);
     }
 
+    [Authorize(Roles = nameof(RoleType.Admin))]
+    [HttpGet("{userId:int}/permissions")]
+    [Validate<Request.UserIdRoute>]
+    [ProducesResponseType(typeof(Result<Response.GetUserPermissionsResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetUserPermissions(
+        [FromRoute] Request.UserIdRoute route,
+        CancellationToken cancellationToken)
+        => Ok(await _userService.GetUserPermissions(route.UserId, cancellationToken));
+
     [Authorize]
     [HttpPut("{userId:int}/roles")]
-    [Validate<Request.UserRolesRoute>]
+    [Validate<Request.UserIdRoute>]
     [Validate<Command.ReplaceUserRoles>]
     [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
     public async Task<IActionResult> ReplaceUserRoles(
-        [FromRoute] Request.UserRolesRoute route,
+        [FromRoute] Request.UserIdRoute route,
         [FromBody] Command.ReplaceUserRoles request,
         CancellationToken cancellationToken = default)
     {

@@ -3,9 +3,9 @@ using INuStore.Contract.Service.V1.User;
 
 namespace INuStore.UseCase.UseCases.V1.UserService.Validators;
 
-public sealed class UserRolesRouteValidator : AbstractValidator<Request.UserRolesRoute>
+public sealed class UserIdRouteValidator : AbstractValidator<Request.UserIdRoute>
 {
-    public UserRolesRouteValidator()
+    public UserIdRouteValidator()
     {
         RuleFor(request => request.UserId)
             .GreaterThan(0).WithMessage("UserId must be greater than 0.");

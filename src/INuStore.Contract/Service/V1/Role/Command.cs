@@ -7,4 +7,6 @@ public static class Command
     public sealed record UpdateRole(int RoleId, string Name, string? Description);
 
     public sealed record DeleteRole(int RoleId);
+
+    public sealed record AssignPermissions(IReadOnlyList<int> PermissionIds);
 }

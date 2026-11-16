@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using INuStore.UseCase.Abstractions.Security;
 using INuStore.UseCase.Abstractions.Services;
 using INuStore.UseCase.Abstractions.UnitOfWork;
@@ -6,6 +6,7 @@ using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.User;
 using INuStore.Domain.Entities.Identity;
 using INuStore.Domain.Exceptions;
+using PermissionResponse = INuStore.Contract.Service.V1.Permission.Response.PermissionResponse;
 
 namespace INuStore.UseCase.UseCases.V1.UserService;
 
@@ -81,6 +82,18 @@ public class UserService : IUserService
                 userRole.Role.Description))
             .ToList();
         return Result.Success(new Response.GetUserRolesResponse(user.Id, roles));
+    }
+
+    public async Task<Result<Response.GetUserPermissionsResponse>> GetUserPermissions(int userId, CancellationToken cancellationToken = default)
+    {
+        if (!await _unitOfWork.UserRepository.ExistsAsync(userId, cancellationToken))
+        {
+            throw new UserException.UserNotFoundException(userId);
+        }
+
+        var permissions = await _unitOfWork.PermissionRepository.GetByUserIdAsync(userId, cancellationToken);
+        var permissionResponses = _mapper.Map<List<PermissionResponse>>(permissions);
+        return Result.Success(new Response.GetUserPermissionsResponse(userId, permissionResponses));
     }
 
     public async Task<Result> AssignRoleToUser(Command.AssignRoleToUser request, CancellationToken cancellationToken = default)

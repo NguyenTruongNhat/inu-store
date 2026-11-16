@@ -1,4 +1,4 @@
-﻿using INuStore.UseCase.Abstractions.Repositories;
+using INuStore.UseCase.Abstractions.Repositories;
 using INuStore.Domain.Entities.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,6 +28,9 @@ public sealed class UserRepository : RepositoryBase<User, int>, IUserRepository
                 .ThenInclude(ur => ur.Role)
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
+
+    public Task<bool> ExistsAsync(int userId, CancellationToken cancellationToken = default)
+        => _context.Users.AnyAsync(user => user.Id == userId, cancellationToken);
 
     public void RemoveUserRole(UserRole userRole)
     {

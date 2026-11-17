@@ -93,7 +93,7 @@ Mục tiêu: Ôn tập authorization, policy-based authorization và quan hệ m
 - [x] **4.6** Thu hồi Permission khỏi Role.
 - [x] **4.7** Xem danh sách Permission của User.
 - [x] **4.8** Kiểm tra quyền truy cập theo Role.
-- [ ] **4.9** Kiểm tra quyền truy cập theo Permission.
+- [x] **4.9** Kiểm tra quyền truy cập theo Permission.
 - [ ] **4.10** Xây dựng custom Authorization Policy.
 - [ ] **4.11** Xây dựng custom Authorization Handler.
 - [ ] **4.12** Dynamic Permission Authorization.

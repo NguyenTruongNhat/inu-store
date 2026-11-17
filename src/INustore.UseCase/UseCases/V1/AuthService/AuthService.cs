@@ -34,6 +34,15 @@ public class AuthService : IAuthService
         }
         List<Claim> claims = BuildClaim(user);
 
+        if (user.UserRoles.Count > 0)
+        {
+            var permissions = await _unitOfWork.PermissionRepository.GetByUserIdAsync(user.Id, cancellationToken);
+            foreach (var permission in permissions)
+            {
+                claims.Add(new Claim(CustomClaimTypes.Permissions, permission.Name));
+            }
+        }
+
         var accessToken = _jwtTokenService.GenerateAccessToken(claims);
         var refreshToken = _jwtTokenService.GenerateRefreshToken();
 

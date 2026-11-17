@@ -1,5 +1,6 @@
 using INuStore.UseCase.Abstractions.Services;
 using INuStore.API.Filters;
+using INuStore.API.Authorization;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.User;
 using INuStore.Domain.Enums;
@@ -28,7 +29,7 @@ public class UserController : ApiController
         return Ok(response);
     }
 
-    [Authorize]
+    [HasPermission("User::GetAllUsers")]
     [HttpGet("GetAllUsers")]
     public async Task<IActionResult> GetAllUsers([FromQuery] Query.GetAllUsers request, CancellationToken cancellationToken = default)
     {

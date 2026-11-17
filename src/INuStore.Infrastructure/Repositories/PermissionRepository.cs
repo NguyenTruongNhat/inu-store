@@ -29,6 +29,12 @@ public sealed class PermissionRepository : RepositoryBase<Permission, int>, IPer
             .OrderBy(permission => permission.Name)
             .ToListAsync(cancellationToken);
 
+
+    public Task<List<Permission>> GetByUserIdAsync2(int userId, CancellationToken cancellationToken = default)
+        => FindAll(permission => permission.RolePermissions.Any(assignment =>
+                assignment.Role.UserRoles.Any(userRole => userRole.UserId == userId)))
+            .OrderBy(permission => permission.Name)
+            .ToListAsync(cancellationToken);
     public Task<bool> PermissionNameExistsAsync(string permissionName, int? excludedPermissionId, CancellationToken cancellationToken = default)
     {
         var permissionsWithMatchingName = FindAll(permission => permission.Name == permissionName);

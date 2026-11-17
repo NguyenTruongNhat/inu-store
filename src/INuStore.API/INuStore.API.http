@@ -4,6 +4,8 @@
 @pageIndex = 1
 @pageSize = 10
 @accessToken = replace-with-access-token
+@withGetAllUsersPermissionToken = replace-with-token-with-get-all-users-permission
+@withoutGetAllUsersPermissionToken = replace-with-token-without-get-all-users-permission
 @adminAccessToken = replace-with-admin-access-token
 @managerAccessToken = replace-with-manager-access-token
 @roleId = 6
@@ -17,8 +19,18 @@ Accept: text/plain
 GET {{INuStore.API_HostAddress}}/health/ready
 Accept: text/plain
 
-### Get all users
+### Get all users (200 with User::GetAllUsers)
 GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/GetAllUsers?PageIndex={{pageIndex}}&PageSize={{pageSize}}
+Authorization: Bearer {{withGetAllUsersPermissionToken}}
+Accept: application/json
+
+### Get all users (401 without an access token)
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/GetAllUsers?PageIndex={{pageIndex}}&PageSize={{pageSize}}
+Accept: application/json
+
+### Get all users (403 with a valid token missing User::GetAllUsers)
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/GetAllUsers?PageIndex={{pageIndex}}&PageSize={{pageSize}}
+Authorization: Bearer {{withoutGetAllUsersPermissionToken}}
 Accept: application/json
 
 ### Get a user by ID (replace userId above with an existing user's ID)

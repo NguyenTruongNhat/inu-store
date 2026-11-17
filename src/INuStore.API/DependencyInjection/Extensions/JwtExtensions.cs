@@ -1,5 +1,7 @@
 ﻿using INuStore.Infrastructure.DependencyInjection.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using INuStore.API.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -63,6 +65,7 @@ public static class JwtExtensions
 
     public static void AddAuthorizationApi(this IServiceCollection services)
     {
+        services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
         services.AddAuthorization(options =>
         {
             options.AddPolicy("allow-gmail", policy =>

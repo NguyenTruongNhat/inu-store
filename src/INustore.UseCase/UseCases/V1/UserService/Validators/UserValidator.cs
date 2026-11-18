@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using INuStore.UseCase.Abstractions.UnitOfWork;
 using INuStore.Contract.Service.V1.User;
 
 namespace INuStore.UseCase.UseCases.V1.UserService.Validators;

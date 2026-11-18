@@ -1,7 +1,7 @@
-﻿using INuStore.UseCase.Abstractions.Repositories;
+﻿using System.Linq.Expressions;
 using INuStore.Domain;
+using INuStore.UseCase.Abstractions.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace INuStore.Infrastructure.Repositories;
 

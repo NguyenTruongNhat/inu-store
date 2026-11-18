@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace INuStore.Domain.Entities.Identity;
+﻿namespace INuStore.Domain.Entities.Identity;
 
 public class Role : DomainEntity<int>
 {

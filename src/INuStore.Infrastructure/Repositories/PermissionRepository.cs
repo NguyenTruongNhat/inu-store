@@ -1,5 +1,5 @@
-using INuStore.UseCase.Abstractions.Repositories;
 using INuStore.Domain.Entities.Identity;
+using INuStore.UseCase.Abstractions.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace INuStore.Infrastructure.Repositories;

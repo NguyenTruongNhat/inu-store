@@ -1,6 +1,6 @@
-﻿using INuStore.UseCase.Exceptions;
+﻿using System.Text.Json;
 using INuStore.Domain.Exceptions;
-using System.Text.Json;
+using INuStore.UseCase.Exceptions;
 
 
 namespace INuStore.API.Middlewares;

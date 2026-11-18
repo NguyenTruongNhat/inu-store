@@ -2,7 +2,7 @@
 
 namespace INuStore.Infrastructure.Security;
 
-public class BCryptPasswordHasher  : IPasswordHasher
+public class BCryptPasswordHasher : IPasswordHasher
 {
     public string Hash(string password)
     {

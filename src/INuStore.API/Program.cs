@@ -1,7 +1,7 @@
-using INuStore.UseCase.DependencyInjection.Extensions;
 using INuStore.API.DependencyInjection.Extensions;
 using INuStore.API.Middlewares;
 using INuStore.Infrastructure.DependencyInjection.Extensions;
+using INuStore.UseCase.DependencyInjection.Extensions;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);

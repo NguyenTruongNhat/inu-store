@@ -1,4 +1,5 @@
 ﻿namespace INuStore.Domain;
+
 public abstract class DomainEntity<T>
 {
     public virtual T Id { get; set; }

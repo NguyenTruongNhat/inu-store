@@ -1,4 +1,5 @@
 ﻿namespace INuStore.Contract.Abstractions.Share;
+
 public class Result
 {
     protected internal Result(bool isSuccess, Error error)

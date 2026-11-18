@@ -1,12 +1,12 @@
+using System.Security.Claims;
+using INuStore.Contract.Service.V1.Auth;
+using INuStore.Domain.Entities.Identity;
 using INuStore.UseCase.Abstractions.Repositories;
 using INuStore.UseCase.Abstractions.Security;
 using INuStore.UseCase.Abstractions.UnitOfWork;
 using INuStore.UseCase.Exceptions;
 using INuStore.UseCase.UseCases.V1.AuthService;
-using INuStore.Contract.Service.V1.Auth;
-using INuStore.Domain.Entities.Identity;
 using Moq;
-using System.Security.Claims;
 
 namespace INuStore.Tests;
 

@@ -1,5 +1,5 @@
-using INuStore.Contract.Service.V1.User;
 using INuStore.Contract.Abstractions.Share;
+using INuStore.Contract.Service.V1.User;
 
 namespace INuStore.UseCase.Abstractions.Services;
 

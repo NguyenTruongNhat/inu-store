@@ -1,6 +1,6 @@
+using INuStore.Infrastructure.Exceptions;
 using INuStore.UseCase.Abstractions.Repositories;
 using INuStore.UseCase.Abstractions.UnitOfWork;
-using INuStore.Infrastructure.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace INuStore.Infrastructure;

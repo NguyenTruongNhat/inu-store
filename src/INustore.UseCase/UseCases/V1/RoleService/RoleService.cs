@@ -1,11 +1,11 @@
 using AutoMapper;
-using INuStore.UseCase.Abstractions.Services;
-using INuStore.UseCase.Abstractions.UnitOfWork;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.Role;
 using INuStore.Domain.Entities.Identity;
 using INuStore.Domain.Enums;
 using INuStore.Domain.Exceptions;
+using INuStore.UseCase.Abstractions.Services;
+using INuStore.UseCase.Abstractions.UnitOfWork;
 
 namespace INuStore.UseCase.UseCases.V1.RoleService;
 

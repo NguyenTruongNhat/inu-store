@@ -1,5 +1,5 @@
-﻿using INuStore.UseCase.Abstractions.Services;
-using INuStore.Contract.Service.V1.Auth;
+﻿using INuStore.Contract.Service.V1.Auth;
+using INuStore.UseCase.Abstractions.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace INuStore.API.Controllers;

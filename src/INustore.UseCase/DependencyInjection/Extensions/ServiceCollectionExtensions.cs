@@ -1,9 +1,9 @@
 using FluentValidation;
 using INuStore.UseCase.Abstractions.Services;
 using INuStore.UseCase.UseCases.V1.AuthService;
-using INuStore.UseCase.UseCases.V1.UserService;
-using INuStore.UseCase.UseCases.V1.RoleService;
 using INuStore.UseCase.UseCases.V1.PermissionService;
+using INuStore.UseCase.UseCases.V1.RoleService;
+using INuStore.UseCase.UseCases.V1.UserService;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace INuStore.UseCase.DependencyInjection.Extensions;

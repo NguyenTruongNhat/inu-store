@@ -1,8 +1,8 @@
-using INuStore.UseCase.Exceptions;
+using System.Text.Json;
 using INuStore.API.Middlewares;
+using INuStore.UseCase.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
-using System.Text.Json;
 
 namespace INuStore.Tests;
 

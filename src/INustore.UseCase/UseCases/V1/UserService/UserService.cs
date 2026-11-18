@@ -1,11 +1,11 @@
 using AutoMapper;
-using INuStore.UseCase.Abstractions.Security;
-using INuStore.UseCase.Abstractions.Services;
-using INuStore.UseCase.Abstractions.UnitOfWork;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.User;
 using INuStore.Domain.Entities.Identity;
 using INuStore.Domain.Exceptions;
+using INuStore.UseCase.Abstractions.Security;
+using INuStore.UseCase.Abstractions.Services;
+using INuStore.UseCase.Abstractions.UnitOfWork;
 using PermissionResponse = INuStore.Contract.Service.V1.Permission.Response.PermissionResponse;
 
 namespace INuStore.UseCase.UseCases.V1.UserService;

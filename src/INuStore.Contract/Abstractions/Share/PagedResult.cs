@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 namespace INuStore.Contract.Abstractions.Share;
+
 public class PagedResult<T>
 {
     public const int UpperPageSize = 100;

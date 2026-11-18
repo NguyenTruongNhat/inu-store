@@ -1,9 +1,9 @@
-﻿using INuStore.Infrastructure.DependencyInjection.Options;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System.Text;
 using INuStore.API.Authorization;
+using INuStore.Infrastructure.DependencyInjection.Options;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 namespace ApiGateway.DependencyInjection.Extensions;
 

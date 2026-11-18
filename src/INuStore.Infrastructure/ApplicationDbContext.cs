@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 
 namespace INuStore.Infrastructure;
+
 public sealed class ApplicationDbContext : DbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)

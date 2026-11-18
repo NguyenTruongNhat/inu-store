@@ -50,5 +50,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/INuStore.Tests/INuStore.Tests.csproj" Id="e41c2fd2-3044-4129-9b40-09c7f026437d" />
+    <Project Path="tests/INuStore.UnitTets/INuStore.UnitTets.csproj" Id="bac7272a-bc8a-4fc6-89c1-d6d679e243a3" />
   </Folder>
 </Solution>

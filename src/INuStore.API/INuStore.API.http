@@ -16,6 +16,60 @@
 @otherEmailUserId = replace-with-existing-user-with-another-email-id
 @otherEmailUserName = replace-with-that-users-current-username
 
+### V2 CreateUser: 200, using SemaphoreSlim in this API process
+# Reuses the V1 request/validation/permission and the two-accounts-per-email rule.
+# The shared singleton semaphore has ONE permit, serializing count + insert + commit.
+# V1 CreateUser and V1 UpdateUser participate in the same gate to prevent mixed-version races.
+# V2 counts with ordinary EF CountAsync, without UPDLOCK/HOLDLOCK.
+# Only HTTP requests through this process are protected; callers outside HTTP need equivalent coordination.
+# Apply ProtectUserNamesAndEmails before running these requests against a test database.
+POST {{INuStore.API_HostAddress}}/api/v2/User/CreateUser
+Authorization: Bearer {{withCreateUserPermissionToken}}
+Content-Type: application/json
+
+{ "userName": "v2user_one", "email": "v2shared@example.com", "password": "TestPassword123!" }
+
+### V2 second username with the same email: 200
+POST {{INuStore.API_HostAddress}}/api/v2/User/CreateUser
+Authorization: Bearer {{withCreateUserPermissionToken}}
+Content-Type: application/json
+
+{ "userName": "v2user_two", "email": " V2SHARED@EXAMPLE.COM ", "password": "TestPassword123!" }
+
+### V2 third username with the same email: 409
+POST {{INuStore.API_HostAddress}}/api/v2/User/CreateUser
+Authorization: Bearer {{withCreateUserPermissionToken}}
+Content-Type: application/json
+
+{ "userName": "v2user_three", "email": "v2shared@example.com", "password": "TestPassword123!" }
+
+### V2 missing token: 401
+POST {{INuStore.API_HostAddress}}/api/v2/User/CreateUser
+Content-Type: application/json
+
+{ "userName": "v2user_one", "email": "v2shared@example.com", "password": "TestPassword123!" }
+
+### V2 missing User::CreateUser: 403
+POST {{INuStore.API_HostAddress}}/api/v2/User/CreateUser
+Authorization: Bearer {{withoutCreateUserPermissionToken}}
+Content-Type: application/json
+
+{ "userName": "v2user_one", "email": "v2shared@example.com", "password": "TestPassword123!" }
+
+### V2 invalid request: 400 when SQL Server is available
+POST {{INuStore.API_HostAddress}}/api/v2/User/CreateUser
+Authorization: Bearer {{withCreateUserPermissionToken}}
+Content-Type: application/json
+
+{ "userName": "invalid user", "email": "invalid-email", "password": "weak" }
+
+# V2 concurrency checks on a disposable test database:
+# Send three V2 creates with distinct usernames and one previously unused email together.
+# Expect two 200 responses, one 409, and two stored accounts for that email.
+# With one existing account, race V2/V1 creates or V2 create/V1 UpdateUser targeting the same email.
+# Expect one success and one 409. After a 400/409 or cancellation, another valid write must still work.
+# Swagger lists V2 CreateUser at /swagger/v2/swagger.json; V1 routes remain in /swagger/v1/swagger.json.
+
 ### Liveness: API is responding without checking SQL Server
 GET {{INuStore.API_HostAddress}}/health/live
 Accept: text/plain

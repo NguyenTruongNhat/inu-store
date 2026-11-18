@@ -41,6 +41,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 // Custom Middleware for Global transaction
+app.UseMiddleware<UserWriteLockMiddleware>();
 app.UseMiddleware<TransactionMiddleware>();
 
 app.MapControllers();

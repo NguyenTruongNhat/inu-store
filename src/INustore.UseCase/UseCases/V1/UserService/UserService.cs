@@ -38,7 +38,13 @@ public class UserService : IUserService
         return Result.Success(new Response.GetUserByIdResponse(userResponse));
     }
 
-    public async Task<Result> CreateUser(Command.CreateUser request, CancellationToken cancellationToken = default)
+    public Task<Result> CreateUser(Command.CreateUser request, CancellationToken cancellationToken = default)
+        => CreateUserCore(request, useDatabaseEmailLock: true, cancellationToken);
+
+    public Task<Result> CreateUserV2(Command.CreateUser request, CancellationToken cancellationToken = default)
+        => CreateUserCore(request, useDatabaseEmailLock: false, cancellationToken);
+
+    private async Task<Result> CreateUserCore(Command.CreateUser request, bool useDatabaseEmailLock, CancellationToken cancellationToken)
     {
         var normalizedRequest = request with
         {
@@ -51,7 +57,9 @@ public class UserService : IUserService
             throw new UserException.DuplicateUserNameException();
         }
 
-        var emailAccountCount = await _unitOfWork.UserRepository.CountByEmailForUpdateAsync(normalizedRequest.Email, excludedUserId: null, cancellationToken);
+        var emailAccountCount = useDatabaseEmailLock
+            ? await _unitOfWork.UserRepository.CountByEmailForUpdateAsync(normalizedRequest.Email, excludedUserId: null, cancellationToken)
+            : await _unitOfWork.UserRepository.CountByEmailAsync(normalizedRequest.Email, cancellationToken);
         if (emailAccountCount >= 2)
         {
             throw new UserException.EmailAccountLimitExceededException();
@@ -82,8 +90,7 @@ public class UserService : IUserService
         if (user != null)
         {
             var email = request.Email.Trim();
-            var otherEmailAccountCount = await _unitOfWork.UserRepository.CountByEmailForUpdateAsync(
-                email, user.Id, cancellationToken);
+            var otherEmailAccountCount = await _unitOfWork.UserRepository.CountByEmailForUpdateAsync(email, user.Id, cancellationToken);
             if (otherEmailAccountCount >= 2)
             {
                 throw new UserException.EmailAccountLimitExceededException();

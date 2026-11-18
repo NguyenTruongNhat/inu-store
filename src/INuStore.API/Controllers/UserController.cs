@@ -1,5 +1,6 @@
 using INuStore.API.Authorization;
 using INuStore.API.Filters;
+using INuStore.API.Concurrency;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.User;
 using INuStore.Domain.Enums;
@@ -39,6 +40,7 @@ public class UserController : ApiController
     }
 
     [HasPermission(Permissions.User.CreateUser)]
+    [SerializeUserWrites]
     [HttpPost("CreateUser")]
     [Validate<Command.CreateUser>]
     [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
@@ -49,6 +51,7 @@ public class UserController : ApiController
     }
 
     [HttpPut("UpdateUser")]
+    [SerializeUserWrites]
     [Validate<Command.UpdateUser>]
     public async Task<IActionResult> UpdateUser([FromBody] Command.UpdateUser request, CancellationToken cancellationToken = default)
     {

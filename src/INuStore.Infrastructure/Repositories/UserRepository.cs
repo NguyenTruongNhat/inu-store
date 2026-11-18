@@ -16,6 +16,9 @@ public sealed class UserRepository : RepositoryBase<User, int>, IUserRepository
     public Task<bool> ExistsByUserNameAsync(string userName, CancellationToken cancellationToken = default)
         => _context.Users.AnyAsync(user => user.UserName == userName, cancellationToken);
 
+    public Task<int> CountByEmailAsync(string email, CancellationToken cancellationToken = default)
+        => _context.Users.CountAsync(user => user.Email == email, cancellationToken);
+
     public Task<int> CountByEmailForUpdateAsync(string email, int? excludedUserId, CancellationToken cancellationToken = default)
     {
         if (_context.Database.CurrentTransaction is null)

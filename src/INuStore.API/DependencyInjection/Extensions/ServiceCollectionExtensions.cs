@@ -10,6 +10,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<ExceptionHandlingMiddleware>();
         services.AddScoped<TransactionMiddleware>();
+        services.AddSingleton<UserWriteLockMiddleware>();
 
         services.AddControllers();
         services.AddOpenApi();

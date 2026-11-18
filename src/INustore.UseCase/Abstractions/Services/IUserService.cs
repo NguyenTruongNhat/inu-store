@@ -8,6 +8,7 @@ public interface IUserService
     Task<Result<Response.GetUserByIdResponse>> GetUserById(Query.GetUserById request, CancellationToken cancellationToken = default);
     Task<Result<Response.GetAllUsersResponse>> GetAllUsers(Query.GetAllUsers request, CancellationToken cancellationToken = default);
     Task<Result> CreateUser(Command.CreateUser request, CancellationToken cancellationToken = default);
+    Task<Result> CreateUserV2(Command.CreateUser request, CancellationToken cancellationToken = default);
     Task<Result> UpdateUser(Command.UpdateUser request, CancellationToken cancellationToken = default);
     Task<Result> DeleteUser(Command.DeleteUser request, CancellationToken cancellationToken = default);
     Task<Result<Response.GetUserRolesResponse>> GetUserRoles(int userId, CancellationToken cancellationToken = default);

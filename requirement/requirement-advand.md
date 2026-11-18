@@ -8,7 +8,7 @@ Các requirement mới sẽ được đánh dấu `*`, ví dụ `14.20*`, và ti
 
 - [ ] 2.13\* Xử lý trường hợp hai request đồng thời cập nhật cùng một User, đảm bảo không xảy ra Lost Update.
 - [ ] 2.14\* Thiết kế Bulk Update cho 100.000 User, tối ưu memory và database performance.
-- [ ] 2.15\* Xử lý Race Condition khi hai request đồng thời tạo tài khoản với cùng email.
+- [x] 2.15\* Xử lý Race Condition khi hai request đồng thời tạo tài khoản với cùng username.
 - [ ] 2.16\* Thiết kế Keyset Pagination cho bảng User có hàng triệu bản ghi.
 - [ ] 2.17\* Xử lý thay đổi email người dùng trong khi các request khác vẫn đang sử dụng email cũ.
 

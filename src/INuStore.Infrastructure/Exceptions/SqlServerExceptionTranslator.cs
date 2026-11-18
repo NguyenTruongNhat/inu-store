@@ -7,6 +7,7 @@ namespace INuStore.Infrastructure.Exceptions;
 
 internal static class SqlServerExceptionTranslator
 {
+    private const string UserNameIndex = "IX_Users_UserName";
     private const string RoleNameIndex = "IX_Roles_Name";
     private const string RoleAssignmentForeignKey = "FK_UserRoles_Roles_RoleId";
     private const string PermissionNameIndex = "IX_Permissions_Name";
@@ -23,6 +24,11 @@ internal static class SqlServerExceptionTranslator
         // structured property. Keep that provider-specific matching here.
         foreach (SqlError error in sqlException.Errors)
         {
+            if (IsDuplicateUserValue(error, exception, UserNameIndex))
+            {
+                return new UserException.DuplicateUserNameException(exception);
+            }
+
             if (IsDuplicateRoleName(error, exception))
             {
                 return new RoleException.DuplicateRoleNameException(exception);
@@ -46,6 +52,12 @@ internal static class SqlServerExceptionTranslator
 
         return null;
     }
+
+    private static bool IsDuplicateUserValue(SqlError error, DbUpdateException exception, string indexName)
+        => error.Number is 2601 or 2627
+            && error.Message.Contains($"'{indexName}'", StringComparison.Ordinal)
+            && exception.Entries.Any(entry => entry.Entity is User
+                && entry.State is EntityState.Added or EntityState.Modified);
 
     private static bool IsDuplicateRoleName(SqlError error, DbUpdateException exception)
         => error.Number is 2601 or 2627

@@ -6,10 +6,15 @@
 @accessToken = replace-with-access-token
 @withGetAllUsersPermissionToken = replace-with-token-with-get-all-users-permission
 @withoutGetAllUsersPermissionToken = replace-with-token-without-get-all-users-permission
+@withCreateUserPermissionToken = replace-with-token-with-create-user-permission
+@withoutCreateUserPermissionToken = replace-with-token-without-create-user-permission
 @adminAccessToken = replace-with-admin-access-token
 @managerAccessToken = replace-with-manager-access-token
 @roleId = 6
 @permissionId = 1
+@sharedEmailUserId = replace-with-testuser-id
+@otherEmailUserId = replace-with-existing-user-with-another-email-id
+@otherEmailUserName = replace-with-that-users-current-username
 
 ### Liveness: API is responding without checking SQL Server
 GET {{INuStore.API_HostAddress}}/health/live
@@ -37,8 +42,12 @@ Accept: application/json
 GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/GetUserById?UserId={{userId}}
 Accept: application/json
 
-### Create a user
+### Create a user: 200 { "isSuccess": true, "isFailure": false, "error": { "code": "", "message": "" } }
+# Apply the revised ProtectUserNamesAndEmails first. Repeat for 409 due to the username.
+# Username is unique; email allows two accounts, comparing case-insensitively.
+# UserName and Email are trimmed; no role is assigned. Password is never trimmed.
 POST {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/CreateUser
+Authorization: Bearer {{withCreateUserPermissionToken}}
 Content-Type: application/json
 
 {
@@ -46,6 +55,74 @@ Content-Type: application/json
   "email": "testuser@example.com",
   "password": "TestPassword123!"
 }
+
+### Create a user without a token: 401
+POST {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/CreateUser
+Content-Type: application/json
+
+{ "userName": "testuser", "email": "testuser@example.com", "password": "TestPassword123!" }
+
+### Create a user without User::CreateUser: 403
+POST {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/CreateUser
+Authorization: Bearer {{withoutCreateUserPermissionToken}}
+Content-Type: application/json
+
+{ "userName": "testuser", "email": "testuser@example.com", "password": "TestPassword123!" }
+
+### Invalid username, email and password: 400 when SQL Server is available
+POST {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/CreateUser
+Authorization: Bearer {{withCreateUserPermissionToken}}
+Content-Type: application/json
+
+{ "userName": "nhat nguyen", "email": "invalid-email", "password": "weak" }
+
+### Duplicate username ignoring case: 409 after creating testuser above
+# { "title": "Conflict", "status": 409, "detail": "Username already exists.", "errors": null }
+POST {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/CreateUser
+Authorization: Bearer {{withCreateUserPermissionToken}}
+Content-Type: application/json
+
+{ "userName": " TESTUSER ", "email": "another@example.com", "password": "TestPassword123!" }
+
+### Second account with the same email: 200 after creating testuser above
+POST {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/CreateUser
+Authorization: Bearer {{withCreateUserPermissionToken}}
+Content-Type: application/json
+
+{ "userName": "anotheruser", "email": " TESTUSER@EXAMPLE.COM ", "password": "TestPassword123!" }
+
+### Third account with the same email: 409 after both accounts above exist
+# { "title": "Conflict", "status": 409, "detail": "Email is already used by two accounts.", "errors": null }
+POST {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/CreateUser
+Authorization: Bearer {{withCreateUserPermissionToken}}
+Content-Type: application/json
+
+{ "userName": "thirduser", "email": "testuser@example.com", "password": "TestPassword123!" }
+
+### Keep a shared email on an existing account: 200 (set sharedEmailUserId to testuser's ID)
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/UpdateUser
+Content-Type: application/json
+
+{ "userId": {{sharedEmailUserId}}, "userName": "testuser", "email": " TESTUSER@EXAMPLE.COM " }
+
+### Move another account to the full email: 409 (set otherEmailUserId and otherEmailUserName)
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/UpdateUser
+Content-Type: application/json
+
+{ "userId": {{otherEmailUserId}}, "userName": "{{otherEmailUserName}}", "email": "testuser@example.com" }
+
+### Invalid email on update: 400 when SQL Server is available
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/UpdateUser
+Content-Type: application/json
+
+{ "userId": {{userId}}, "userName": "updateduser", "email": "invalid-email" }
+
+# Concurrency checks on a disposable test database:
+# With one account using the target email, send two CreateUser requests together
+# with distinct new usernames. Expect one 200, one 409, and two stored accounts.
+# Repeat with CreateUser and UpdateUser of another existing account together.
+# Keep the same target email and confirm its stored account count never exceeds two.
+# Direct SQL writes bypass this application limit; IX_Users_Email is not unique.
 
 ### Update a user
 PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/UpdateUser

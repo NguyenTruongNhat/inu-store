@@ -3,6 +3,7 @@ using INuStore.API.Filters;
 using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.User;
 using INuStore.Domain.Enums;
+using INuStore.Domain.Constants;
 using INuStore.UseCase.Abstractions.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,8 +38,10 @@ public class UserController : ApiController
         return Ok(response);
     }
 
+    [HasPermission(Permissions.User.CreateUser)]
     [HttpPost("CreateUser")]
     [Validate<Command.CreateUser>]
+    [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
     public async Task<IActionResult> CreateUser([FromBody] Command.CreateUser request, CancellationToken cancellationToken = default)
     {
         var result = await _userService.CreateUser(request, cancellationToken);

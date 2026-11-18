@@ -13,6 +13,25 @@ public sealed class UserRepository : RepositoryBase<User, int>, IUserRepository
         _context = context;
     }
 
+    public Task<bool> ExistsByUserNameAsync(string userName, CancellationToken cancellationToken = default)
+        => _context.Users.AnyAsync(user => user.UserName == userName, cancellationToken);
+
+    public Task<int> CountByEmailForUpdateAsync(string email, int? excludedUserId, CancellationToken cancellationToken = default)
+    {
+        if (_context.Database.CurrentTransaction is null)
+        {
+            throw new InvalidOperationException("Checking the email account limit requires an active transaction.");
+        }
+
+        // Keep update/range locks until the caller saves and commits, including an empty email range.
+        return _context.Database.SqlQuery<int>($"""
+            SELECT COUNT(*) AS [Value]
+            FROM [Users] WITH (UPDLOCK, HOLDLOCK)
+            WHERE [Email] = {email}
+                AND ({excludedUserId} IS NULL OR [Id] <> {excludedUserId})
+            """).SingleAsync(cancellationToken);
+    }
+
     public Task<User?> GetUserByUserNameAsync(string userName, CancellationToken cancellationToken = default)
         => _context.Users
             .AsTracking()

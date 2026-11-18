@@ -40,7 +40,24 @@ public class UserService : IUserService
 
     public async Task<Result> CreateUser(Command.CreateUser request, CancellationToken cancellationToken = default)
     {
-        var user = _mapper.Map<User>(request);
+        var normalizedRequest = request with
+        {
+            UserName = request.UserName.Trim(),
+            Email = request.Email.Trim()
+        };
+
+        if (await _unitOfWork.UserRepository.ExistsByUserNameAsync(normalizedRequest.UserName, cancellationToken))
+        {
+            throw new UserException.DuplicateUserNameException();
+        }
+
+        var emailAccountCount = await _unitOfWork.UserRepository.CountByEmailForUpdateAsync(normalizedRequest.Email, excludedUserId: null, cancellationToken);
+        if (emailAccountCount >= 2)
+        {
+            throw new UserException.EmailAccountLimitExceededException();
+        }
+
+        var user = _mapper.Map<User>(normalizedRequest);
 
         user.PasswordHash = _passwordHasher.Hash(request.Password);
         _unitOfWork.UserRepository.Add(user);
@@ -64,8 +81,16 @@ public class UserService : IUserService
         var user = await _unitOfWork.UserRepository.FindByIdAsync(request.UserId, cancellationToken);
         if (user != null)
         {
+            var email = request.Email.Trim();
+            var otherEmailAccountCount = await _unitOfWork.UserRepository.CountByEmailForUpdateAsync(
+                email, user.Id, cancellationToken);
+            if (otherEmailAccountCount >= 2)
+            {
+                throw new UserException.EmailAccountLimitExceededException();
+            }
+
             user.UserName = request.UserName;
-            user.Email = request.Email;
+            user.Email = email;
             _unitOfWork.UserRepository.Update(user);
         }
 

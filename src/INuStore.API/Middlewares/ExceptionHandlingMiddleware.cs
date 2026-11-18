@@ -49,6 +49,7 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
         exception switch
         {
             InvalidCredentialsException => StatusCodes.Status401Unauthorized,
+            ConflictException => StatusCodes.Status409Conflict,
             BadRequestException => StatusCodes.Status400BadRequest,
             NotFoundException => StatusCodes.Status404NotFound,
             //Application.Exceptions.ValidationException => StatusCodes.Status422UnprocessableEntity,

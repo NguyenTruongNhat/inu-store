@@ -13,6 +13,6 @@ public class UserProfile : Profile
 
         CreateMap<Command.CreateUser, User>()
             .ForMember(user => user.Id, options => options.Ignore())
-            .ForMember(user => user.PasswordHash, options => options.MapFrom(request => request.Password));
+            .ForMember(user => user.PasswordHash, options => options.Ignore());
     }
 }

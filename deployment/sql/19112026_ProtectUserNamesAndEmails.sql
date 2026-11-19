@@ -263,3 +263,160 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261113092252_SeedRoles'
+)
+BEGIN
+    IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'Id', N'Description', N'Name') AND [object_id] = OBJECT_ID(N'[Roles]'))
+        SET IDENTITY_INSERT [Roles] ON;
+    EXEC(N'INSERT INTO [Roles] ([Id], [Description], [Name])
+    VALUES (1, N''Admin for the Store'', N''Admin''),
+    (2, N''Manager for the Store'', N''Manager''),
+    (3, N''Staff for the Store'', N''Staff''),
+    (4, N''Customer for the Store'', N''Customer''),
+    (5, N''Shipper for the Store'', N''Shipper'')');
+    IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'Id', N'Description', N'Name') AND [object_id] = OBJECT_ID(N'[Roles]'))
+        SET IDENTITY_INSERT [Roles] OFF;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261113092252_SeedRoles'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261113092252_SeedRoles', N'10.0.14');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261114094233_EnsureUniqueRolePermissions'
+)
+BEGIN
+    WITH DuplicateAssignments AS (
+        SELECT ROW_NUMBER() OVER (PARTITION BY RoleId, PermissionId ORDER BY Id) AS RowNumber
+        FROM RolePermissions
+    )
+    DELETE FROM DuplicateAssignments WHERE RowNumber > 1;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261114094233_EnsureUniqueRolePermissions'
+)
+BEGIN
+    DROP INDEX [IX_RolePermissions_RoleId] ON [RolePermissions];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261114094233_EnsureUniqueRolePermissions'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_RolePermissions_RoleId_PermissionId] ON [RolePermissions] ([RoleId], [PermissionId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261114094233_EnsureUniqueRolePermissions'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261114094233_EnsureUniqueRolePermissions', N'10.0.14');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261118095530_ProtectUserNamesAndEmails'
+)
+BEGIN
+    IF EXISTS (SELECT 1 FROM [Users] WHERE DATALENGTH([UserName]) > 100 OR DATALENGTH([Email]) > 508)
+        THROW 51000, 'Usernames or emails exceed the new column limits. Resolve existing data before retrying.', 1;
+
+    DECLARE @Whitespace nvarchar(32) =
+        NCHAR(9) + NCHAR(10) + NCHAR(11) + NCHAR(12) + NCHAR(13) + NCHAR(32) +
+        NCHAR(133) + NCHAR(160) + NCHAR(5760) + NCHAR(8192) + NCHAR(8193) +
+        NCHAR(8194) + NCHAR(8195) + NCHAR(8196) + NCHAR(8197) + NCHAR(8198) +
+        NCHAR(8199) + NCHAR(8200) + NCHAR(8201) + NCHAR(8202) + NCHAR(8232) +
+        NCHAR(8233) + NCHAR(8239) + NCHAR(8287) + NCHAR(12288);
+
+    IF EXISTS (SELECT 1 FROM [Users]
+        WHERE DATALENGTH([UserName]) <> DATALENGTH(TRIM(@Whitespace FROM [UserName]))
+           OR DATALENGTH([Email]) <> DATALENGTH(TRIM(@Whitespace FROM [Email])))
+        THROW 51001, 'Usernames or emails contain leading or trailing whitespace. Resolve existing data before retrying.', 1;
+
+    IF EXISTS (SELECT 1 FROM [Users]
+        GROUP BY [UserName] COLLATE Latin1_General_100_CI_AS HAVING COUNT_BIG(*) > 1)
+        THROW 51002, 'Duplicate usernames exist under the new collation. Resolve existing data before retrying.', 1;
+
+    IF EXISTS (SELECT 1 FROM [Users]
+        GROUP BY [Email] COLLATE Latin1_General_100_CI_AS HAVING COUNT_BIG(*) > 2)
+        THROW 51003, 'An email is used by more than two accounts under the new collation. Resolve existing data before retrying.', 1;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261118095530_ProtectUserNamesAndEmails'
+)
+BEGIN
+    DECLARE @var nvarchar(max);
+    SELECT @var = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Users]') AND [c].[name] = N'UserName');
+    IF @var IS NOT NULL EXEC(N'ALTER TABLE [Users] DROP CONSTRAINT ' + @var + ';');
+    ALTER TABLE [Users] ALTER COLUMN [UserName] nvarchar(50) COLLATE Latin1_General_100_CI_AS NOT NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261118095530_ProtectUserNamesAndEmails'
+)
+BEGIN
+    DECLARE @var1 nvarchar(max);
+    SELECT @var1 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Users]') AND [c].[name] = N'Email');
+    IF @var1 IS NOT NULL EXEC(N'ALTER TABLE [Users] DROP CONSTRAINT ' + @var1 + ';');
+    ALTER TABLE [Users] ALTER COLUMN [Email] nvarchar(254) COLLATE Latin1_General_100_CI_AS NOT NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261118095530_ProtectUserNamesAndEmails'
+)
+BEGIN
+    CREATE INDEX [IX_Users_Email] ON [Users] ([Email]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261118095530_ProtectUserNamesAndEmails'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Users_UserName] ON [Users] ([UserName]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261118095530_ProtectUserNamesAndEmails'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261118095530_ProtectUserNamesAndEmails', N'10.0.14');
+END;
+
+COMMIT;
+GO
+

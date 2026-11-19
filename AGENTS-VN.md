@@ -72,7 +72,7 @@ Profile HTTPS dùng `https://localhost:7005` và `http://localhost:6000` trong m
 
 ## Thay đổi database
 
-Infrastructure chứa migration. API cung cấp cấu hình khởi động cho EF Tool. Dùng `ApplicationDbContext` và kiểm tra `dotnet ef --version` để chọn tool cùng phiên bản chính với EF Core 10. API chạy bình thường không tự áp dụng migration.
+Infrastructure chứa migration. API cung cấp cấu hình khởi động cho EF Tool. Dùng `ApplicationDbContext` và kiểm tra `dotnet ef --version` để chọn tool cùng phiên bản chính với EF Core 10. Trong Development, API gọi extension `ApplyMigrationsAsync` của Infrastructure trước khi cấu hình pipeline. Extension dùng `Database.MigrateAsync` để tạo database theo connection string nếu chưa có và áp dụng các migration còn thiếu. SQL Server phải truy cập được; tài khoản kết nối cần quyền tạo database và thay đổi schema tương ứng. Nếu migration lỗi, API dừng khởi động. Các môi trường khác vẫn áp dụng migration qua lệnh hoặc script triển khai riêng.
 
 ```powershell
 dotnet ef migrations add DescribeSchemaChange --project src/INuStore.Infrastructure --startup-project src/INuStore.API --context ApplicationDbContext -- --environment Development

@@ -1,7 +1,5 @@
-using INuStore.Infrastructure.Exceptions;
 using INuStore.UseCase.Abstractions.Repositories;
 using INuStore.UseCase.Abstractions.UnitOfWork;
-using Microsoft.EntityFrameworkCore;
 
 namespace INuStore.Infrastructure;
 
@@ -24,20 +22,7 @@ public class EFUnitOfWork : IUnitOfWork
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        try
-        {
-            await _context.SaveChangesAsync(cancellationToken);
-        }
-        catch (DbUpdateException exception)
-        {
-            var translatedException = SqlServerExceptionTranslator.Translate(exception);
-            if (translatedException is not null)
-            {
-                throw translatedException;
-            }
-
-            throw;
-        }
+        await _context.SaveChangesAsync(cancellationToken);
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()

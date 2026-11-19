@@ -1,6 +1,5 @@
 using INuStore.API.Authorization;
 using INuStore.API.Filters;
-using INuStore.Contract.Abstractions.Share;
 using INuStore.Contract.Service.V1.User;
 using INuStore.Domain.Constants;
 using INuStore.Domain.Enums;
@@ -23,7 +22,6 @@ public class UserController : ApiController
     [Authorize(Policy = "allow-gmail")]
     [HttpGet("GetUserById")]
     [Validate<Query.GetUserById>]
-    [ProducesResponseType(typeof(Result<Response.GetUserByIdResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUserById([FromQuery] Query.GetUserById request, CancellationToken cancellationToken = default)
     {
         var response = await _userService.GetUserById(request, cancellationToken);
@@ -41,7 +39,6 @@ public class UserController : ApiController
     [HasPermission(Permissions.User.CreateUser)]
     [HttpPost("CreateUser")]
     [Validate<Command.CreateUser>]
-    [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
     public async Task<IActionResult> CreateUser([FromBody] Command.CreateUser request, CancellationToken cancellationToken = default)
     {
         var result = await _userService.CreateUser(request, cancellationToken);
@@ -67,7 +64,6 @@ public class UserController : ApiController
     [Authorize]
     [HttpGet("{userId:int}/roles")]
     [Validate<Request.UserIdRoute>]
-    [ProducesResponseType(typeof(Result<Response.GetUserRolesResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUserRoles([FromRoute] Request.UserIdRoute route, CancellationToken cancellationToken = default)
     {
         var result = await _userService.GetUserRoles(route.UserId, cancellationToken);
@@ -78,7 +74,6 @@ public class UserController : ApiController
     [Authorize(Roles = nameof(RoleType.Admin))]
     [HttpGet("{userId:int}/permissions")]
     [Validate<Request.UserIdRoute>]
-    [ProducesResponseType(typeof(Result<Response.GetUserPermissionsResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUserPermissions(
         [FromRoute] Request.UserIdRoute route,
         CancellationToken cancellationToken)
@@ -88,7 +83,6 @@ public class UserController : ApiController
     [HttpPut("{userId:int}/roles")]
     [Validate<Request.UserIdRoute>]
     [Validate<Command.ReplaceUserRoles>]
-    [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
     public async Task<IActionResult> ReplaceUserRoles(
         [FromRoute] Request.UserIdRoute route,
         [FromBody] Command.ReplaceUserRoles request,
@@ -101,7 +95,6 @@ public class UserController : ApiController
     [Authorize]
     [HttpPut("{userId:int}/roles/{roleId:int}")]
     [Validate<Command.AssignRoleToUser>]
-    [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
     public async Task<IActionResult> AssignRoleToUser(
         [FromRoute] Command.AssignRoleToUser request,
         CancellationToken cancellationToken = default)
@@ -113,7 +106,6 @@ public class UserController : ApiController
     [Authorize]
     [HttpDelete("{userId:int}/roles/{roleId:int}")]
     [Validate<Command.RemoveRoleFromUser>]
-    [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
     public async Task<IActionResult> RemoveRoleFromUser(
         [FromRoute] Command.RemoveRoleFromUser request,
         CancellationToken cancellationToken = default)

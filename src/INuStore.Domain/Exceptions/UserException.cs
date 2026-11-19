@@ -2,8 +2,8 @@
 
 public static class UserException
 {
-    public sealed class DuplicateUserNameException(Exception? innerException = null)
-        : ConflictException("Username already exists.", innerException);
+    public sealed class DuplicateUserNameException()
+        : ConflictException("Username already exists.");
 
     public sealed class EmailAccountLimitExceededException()
         : ConflictException("Email is already used by two accounts.");

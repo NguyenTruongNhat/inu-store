@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using INuStore.Domain.Exceptions;
 using INuStore.UseCase.Exceptions;
-
+using Microsoft.EntityFrameworkCore;
 
 namespace INuStore.API.Middlewares;
 
@@ -34,7 +34,7 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
         {
             title = GetTitle(exception),
             status = statusCode,
-            detail = exception.Message,
+            detail = GetDetail(exception, statusCode),
             errors = GetErrors(exception),
         };
 
@@ -48,6 +48,8 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
     private static int GetStatusCode(Exception exception) =>
         exception switch
         {
+            DbUpdateConcurrencyException => StatusCodes.Status409Conflict,
+            DbUpdateException => StatusCodes.Status500InternalServerError,
             InvalidCredentialsException => StatusCodes.Status401Unauthorized,
             ConflictException => StatusCodes.Status409Conflict,
             BadRequestException => StatusCodes.Status400BadRequest,
@@ -61,8 +63,18 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
     private static string GetTitle(Exception exception) =>
         exception switch
         {
+            DbUpdateConcurrencyException => "Conflict",
             DomainException applicationException => applicationException.Title,
             _ => "Server Error"
+        };
+
+    private static string GetDetail(Exception exception, int statusCode) =>
+        exception switch
+        {
+            DbUpdateConcurrencyException => "This record has changed or no longer exists. Please refresh and try again.",
+            DbUpdateException => "Record have been changed by another user. Please refresh and try again.",
+            _ when statusCode == StatusCodes.Status500InternalServerError => "Something went wrong. Please try again later.",
+            _ => exception.Message
         };
 
     private static IReadOnlyCollection<ValidationError> GetErrors(Exception exception)

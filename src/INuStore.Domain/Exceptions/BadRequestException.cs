@@ -6,9 +6,4 @@ public abstract class BadRequestException : DomainException
         : base("Bad Request", message)
     {
     }
-
-    protected BadRequestException(string message, Exception innerException)
-        : base("Bad Request", message, innerException)
-    {
-    }
 }

@@ -1,7 +1,9 @@
 using INuStore.Infrastructure.Authentication;
+using INuStore.Infrastructure.Caching;
 using INuStore.Infrastructure.DependencyInjection.Options;
 using INuStore.Infrastructure.Repositories;
 using INuStore.Infrastructure.Security;
+using INuStore.UseCase.Abstractions.Caching;
 using INuStore.UseCase.Abstractions.Repositories;
 using INuStore.UseCase.Abstractions.Security;
 using INuStore.UseCase.Abstractions.UnitOfWork;
@@ -10,6 +12,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+
+
 
 namespace INuStore.Infrastructure.DependencyInjection.Extensions;
 
@@ -22,7 +26,8 @@ public static class ServiceCollectionExtensions
         services.AddSqlConfiguration();
         services.AddHealthCheckConfiguration();
         services.AddRepositoryBaseConfiguration();
-        services.AddPasswordHasherConfiguration();
+        services.AddInfrastructureService();
+        services.AddRedisInfrastructure(configuration);
 
         return services;
     }
@@ -100,10 +105,21 @@ public static class ServiceCollectionExtensions
 
     }
 
-    public static void AddPasswordHasherConfiguration(this IServiceCollection services)
+    public static void AddInfrastructureService(this IServiceCollection services)
     {
         services.AddTransient<IPasswordHasher, BCryptPasswordHasher>()
-                .AddTransient<IJwtTokenService, JwtTokenService>();
+                .AddTransient<IJwtTokenService, JwtTokenService>()
+                .AddTransient<ICacheService, CacheService>();
+        ;
+    }
+
+    public static void AddRedisInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddStackExchangeRedisCache(redisOptions =>
+        {
+            var connectionString = configuration.GetConnectionString("Redis");
+            redisOptions.Configuration = connectionString;
+        });
     }
 
 

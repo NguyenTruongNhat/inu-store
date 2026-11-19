@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using INuStore.Infrastructure.DependencyInjection.Options;
 using INuStore.UseCase.Abstractions.Security;
+using INuStore.UseCase.Exceptions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -25,8 +26,8 @@ public class JwtTokenService : IJwtTokenService
         var tokeOptions = new JwtSecurityToken(
             issuer: jwtOption.Issuer,
             audience: jwtOption.Audience,
-            claims: claims,
-            expires: DateTime.Now.AddMinutes(jwtOption.ExpireMin),
+            claims: claims.Append(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())),
+            expires: DateTime.UtcNow.AddMinutes(jwtOption.ExpireMin),
             signingCredentials: signinCredentials
         );
 
@@ -54,15 +55,32 @@ public class JwtTokenService : IJwtTokenService
             ValidateIssuer = false,
             ValidateLifetime = false, //here we are saying that we don't care about the token's expiration date
             ValidateIssuerSigningKey = true,
+            ValidAlgorithms = [SecurityAlgorithms.HmacSha256],
             IssuerSigningKey = new SymmetricSecurityKey(Key),
             ClockSkew = TimeSpan.Zero
         };
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-        if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-            throw new SecurityTokenException("Invalid token");
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            throw new InvalidTokenException();
+        }
 
-        return principal;
+        try
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            if (securityToken is not JwtSecurityToken jwtSecurityToken
+                || jwtSecurityToken.Header.Alg != SecurityAlgorithms.HmacSha256
+                || jwtSecurityToken.Payload.Expiration is null)
+            {
+                throw new InvalidTokenException();
+            }
+
+            return principal;
+        }
+        catch (Exception exception) when (exception is SecurityTokenException or ArgumentException or FormatException)
+        {
+            throw new InvalidTokenException();
+        }
     }
 }

@@ -62,7 +62,7 @@ Mục tiêu: Ôn tập CRUD, Entity Relationships, LINQ và EF Core.
 - [x] **2.4** Lấy danh sách người dùng.
 - [ ] **2.5** Phân trang, tìm kiếm, lọc và sắp xếp.
 - [ ] **2.7** Soft Delete và khôi phục tài khoản.
-- [ ] **2.10** Kiểm tra trùng email và username.
+- [x] **2.10** Kiểm tra trùng email và username.
 - [ ] **2.11** Áp dụng optimistic concurrency khi cập nhật.
 - [ ] **2.12** Ghi nhận CreatedAt, UpdatedAt, CreatedBy, UpdatedBy.
 
@@ -70,16 +70,16 @@ Mục tiêu: Ôn tập CRUD, Entity Relationships, LINQ và EF Core.
 
 Mục tiêu: Xây dựng hệ thống xác thực an toàn.
 
-- [ ] **3.1** Đăng ký tài khoản.
-- [ ] **3.2** Đăng nhập bằng email và password.
-- [ ] **3.3** Xác thực email khi đăng ký.
-- [ ] **3.4** JWT Access Token.
-- [ ] **3.5** Refresh Token.
-- [ ] **3.6** Refresh Token Rotation.
+- [x] **3.1** Đăng ký tài khoản.
+- [x] **3.2** Đăng nhập bằng email và password.
+- [x] **3.3** Xác thực email khi đăng ký.
+- [x] **3.4** JWT Access Token.
+- [x] **3.5** Refresh Token.
+- [x] **3.6** Refresh Token Rotation.
 - [ ] **3.7** Đăng xuất khỏi thiết bị hiện tại.
 - [ ] **3.14** Multi-Factor Authentication bằng TOTP.
 - [ ] **3.15** Recovery Codes cho MFA.
-- [ ] **3.16** Thu hồi token hoặc session khi có sự kiện bảo mật.
+- [x] **3.16** Thu hồi token hoặc session khi có sự kiện bảo mật.
 
 ### Phase 04 — Authorization (RBAC & Permission)
 
@@ -94,8 +94,8 @@ Mục tiêu: Ôn tập authorization, policy-based authorization và quan hệ m
 - [x] **4.7** Xem danh sách Permission của User.
 - [x] **4.8** Kiểm tra quyền truy cập theo Role.
 - [x] **4.9** Kiểm tra quyền truy cập theo Permission.
-- [ ] **4.10** Xây dựng custom Authorization Policy.
-- [ ] **4.11** Xây dựng custom Authorization Handler.
+- [x] **4.10** Xây dựng custom Authorization Policy.
+- [x] **4.11** Xây dựng custom Authorization Handler.
 - [ ] **4.12** Dynamic Permission Authorization.
 - [ ] **4.13** Phân biệt quyền của Admin và User.
 - [ ] **4.14** Giới hạn truy cập tài nguyên theo quyền sở hữu.

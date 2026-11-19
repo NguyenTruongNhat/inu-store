@@ -51,6 +51,7 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
             DbUpdateConcurrencyException => StatusCodes.Status409Conflict,
             DbUpdateException => StatusCodes.Status500InternalServerError,
             InvalidCredentialsException => StatusCodes.Status401Unauthorized,
+            InvalidTokenException => StatusCodes.Status401Unauthorized,
             ConflictException => StatusCodes.Status409Conflict,
             BadRequestException => StatusCodes.Status400BadRequest,
             NotFoundException => StatusCodes.Status404NotFound,

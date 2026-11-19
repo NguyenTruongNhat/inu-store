@@ -33,7 +33,7 @@ public class RoleController(IRoleService roleService) : ApiController
         => Ok(await roleService.UpdateRole(request, cancellationToken));
 
     [HttpPatch("{roleId:int}/permissions")]
-    [Authorize(Roles = nameof(RoleType.Admin))]
+    //[Authorize(Roles = nameof(RoleType.Admin))]
     [Validate<Request.RoleIdRoute>]
     [Validate<Command.AssignPermissions>]
     public async Task<IActionResult> AssignPermissions([FromRoute] Request.RoleIdRoute route, [FromBody] Command.AssignPermissions request,

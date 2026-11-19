@@ -47,6 +47,15 @@ public class CacheService : ICacheService
         CacheKeys.TryRemove(key, out bool _);
     }
 
+    public async Task SetAsync<T>(string key, T value, DateTimeOffset absoluteExpiration, CancellationToken cancellationToken = default)
+        where T : class
+    {
+        var cacheValue = JsonConvert.SerializeObject(value);
+        var options = new DistributedCacheEntryOptions { AbsoluteExpiration = absoluteExpiration };
+        await _distributedCache.SetStringAsync(key, cacheValue, options, cancellationToken);
+        CacheKeys.TryAdd(key, false);
+    }
+
     public async Task RemoveByPrefixAsync(string prefixKey, CancellationToken cancellationToken = default)
     {
         //foreach (string key in CacheKeys.Keys)

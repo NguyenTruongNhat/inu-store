@@ -1,6 +1,6 @@
-﻿using FluentValidation;
+﻿using System.Text;
+using FluentValidation;
 using INuStore.Contract.Service.V1.User;
-using System.Text;
 
 namespace INuStore.UseCase.UseCases.V1.UserService.Validators;
 

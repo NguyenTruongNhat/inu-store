@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
+using INuStore.API.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace INuStore.API.DependencyInjection.Options;
@@ -17,6 +18,9 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
 
     public void Configure(SwaggerGenOptions options)
     {
+        options.OperationFilter<ActionNameOperationFilter>();
+        options.DescribeAllParametersInCamelCase();
+
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
             Type = SecuritySchemeType.Http,

@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "INuStore.NotificationWorker": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

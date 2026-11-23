@@ -30,6 +30,8 @@
   <Folder Name="/Solution Items/technical-docs/">
     <File Path="technical-docs/0.custom-middleware.MD" />
     <File Path="technical-docs/1.why-savechangeasync-need-to-await.MD" />
+    <File Path="technical-docs/11.unit-test.MD" />
+    <File Path="technical-docs/13.kafka-best-practice-and-usecase.MD" />
     <File Path="technical-docs/2.fluent-validation-flow.MD" />
     <File Path="technical-docs/3.where-to-register-and-inject-dependencies.MD" />
     <File Path="technical-docs/4.ef-core-loading.MD" />
@@ -39,13 +41,13 @@
     <File Path="technical-docs/8.deploy-sql-server-migrations.MD" />
     <File Path="technical-docs/9.ef-core-migration-walkthrough.MD" />
     <File Path="technical-docs/10.custom-permission-authorization.MD" />
-    <File Path="technical-docs/10.unit-test.MD" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/INuStore.API/INuStore.API.csproj" />
     <Project Path="src/INuStore.Contract/INuStore.Contract.csproj" />
     <Project Path="src/INuStore.Domain/INuStore.Domain.csproj" />
     <Project Path="src/INuStore.Infrastructure/INuStore.Infrastructure.csproj" />
+    <Project Path="src/INuStore.NotificationWorker/INuStore.NotificationWorker.csproj" />
     <Project Path="src/INustore.UseCase/INustore.UseCase.csproj" />
   </Folder>
   <Folder Name="/tests/">

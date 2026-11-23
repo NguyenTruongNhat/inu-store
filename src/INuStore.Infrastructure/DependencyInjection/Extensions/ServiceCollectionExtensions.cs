@@ -35,6 +35,7 @@ public static class ServiceCollectionExtensions
         services.AddRepositoryBaseConfiguration();
         services.AddInfrastructureService();
         services.AddRedisInfrastructure(configuration);
+        services.AddKafkaProducer(configuration);
 
         return services;
     }

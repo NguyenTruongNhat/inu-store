@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>INuStore-API-2dcedc33-7ae6-46ac-94c9-b37fbc26f66d</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

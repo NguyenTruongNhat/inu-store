@@ -1,9 +1,11 @@
 using INuStore.Infrastructure.Authentication;
 using INuStore.Infrastructure.Caching;
 using INuStore.Infrastructure.DependencyInjection.Options;
+using INuStore.Infrastructure.Notifications;
 using INuStore.Infrastructure.Repositories;
 using INuStore.Infrastructure.Security;
 using INuStore.UseCase.Abstractions.Caching;
+using INuStore.UseCase.Abstractions.Notifications;
 using INuStore.UseCase.Abstractions.Repositories;
 using INuStore.UseCase.Abstractions.Security;
 using INuStore.UseCase.Abstractions.UnitOfWork;
@@ -22,6 +24,11 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.ConfigureSqlServerRetryOptions(configuration.GetSection(nameof(SqlServerRetryOptions)));
+        services.AddOptions<ResendOptions>()
+            .Bind(configuration.GetSection(ResendOptions.SectionName))
+            .Validate(options => !string.IsNullOrWhiteSpace(options.ApiKey), "Resend API key is required.")
+            .Validate(options => !string.IsNullOrWhiteSpace(options.From), "Resend sender address is required.")
+            .ValidateOnStart();
 
         services.AddSqlConfiguration();
         services.AddHealthCheckConfiguration();
@@ -109,7 +116,8 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<IPasswordHasher, BCryptPasswordHasher>()
                 .AddTransient<IJwtTokenService, JwtTokenService>()
-                .AddTransient<ICacheService, CacheService>();
+                .AddTransient<ICacheService, CacheService>()
+                .AddTransient<IEmailSender, ResendEmailSender>();
         ;
     }
 

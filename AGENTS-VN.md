@@ -1,92 +1,193 @@
-# Hướng dẫn làm việc với INuStore
+# Hướng dẫn dành cho agent
 
-INuStore là API .NET 10 cho đăng nhập, quản lý user, role và gán role cho user. Ứng dụng dùng EF Core để làm việc với SQL Server. [AGENTS.md](AGENTS.md) là hướng dẫn chính của repository. Các bài giải thích từng chủ đề nằm trong [technical-docs](technical-docs/).
+## 1. Tổng quan dự án
 
-## Tìm code ở đâu
+INuStore là ASP.NET Core API quản lý tài khoản, xác thực, role, permission và các quan hệ gán quyền.
+Cả bảy project đều target `net10.0`; tầng lưu trữ dùng EF Core 10.0.14 với SQL Server.
+Ứng dụng dùng BCrypt, JWT ký bằng HS256 và Redis để lưu phiên refresh token. Đây là bản tiếng Việt của [AGENTS.md](AGENTS.md); khi tài liệu khác với code, lấy code làm căn cứ.
 
-| Project | Trách nhiệm |
-| --- | --- |
-| `src/INuStore.API/` | Nhận HTTP request, kiểm tra quyền, validate dữ liệu, chạy middleware và trả response. Mở `Program.cs` để xem cách ghép các phần lại với nhau. |
-| `src/INuStore.Contract/` | Các kiểu dữ liệu API nhận và trả về cho Auth, User và Role. Đây cũng là nơi định nghĩa `Result` và lỗi validation. |
-| `src/INuStore.Domain/` | Các entity `User`, `Role`, `UserRole`, loại role `RoleType` và lỗi nghiệp vụ. |
-| `src/INustore.UseCase/` | Service xử lý nghiệp vụ, validator, mapping và interface mà service cần. Đường dẫn project viết `INustore.UseCase`, namespace viết `INuStore.UseCase`. |
-| `src/INuStore.Infrastructure/` | Kết nối SQL Server, repository, unit of work, cấu hình entity, migration, băm mật khẩu và sinh JWT. |
-| `tests/INuStore.Tests/` | Test đăng nhập, xử lý exception và ranh giới giữa các project. Trong Visual Studio, project này nằm trong solution folder `/tets/`. |
+## 2. Kiến trúc
 
-UseCase dùng Domain và Contract. Infrastructure triển khai các interface của UseCase. API đăng ký và kết nối các thành phần. Domain và Contract độc lập với các project còn lại. Contract có sẵn một tham chiếu EF Core phục vụ `PagedResult<T>.CreateAsync`. Xem `ArchitectureTests.cs` khi thay đổi quan hệ giữa các project.
+Mũi tên biểu thị project reference; kiểm tra `INuStore.slnx` và `.csproj` của từng project.
 
-Đăng ký dependency qua `AddInfrastructure(configuration)`, `AddUseCase()` hoặc `AddApi(configuration)` tùy nơi triển khai. `IUserService` và `IRoleService` là scoped, tức dùng chung trong phạm vi một request. Auth service, repository, unit of work, password hasher và JWT service là transient, tức tạo khi DI cấp dependency. UseCase tự tìm validator và AutoMapper profile trong assembly của nó.
-
-## Request chạy và lưu dữ liệu như thế nào
-
-Controller có tiền tố `/api/v1/`. Đọc `[FromQuery]`, `[FromRoute]` và `[FromBody]` để biết dữ liệu đến từ query string, đường dẫn hay JSON body. `[Validate<TModel>]` gọi FluentValidation sau khi MVC dựng tham số. Lỗi validator trả HTTP 400 cùng danh sách lỗi. Lỗi binding hoặc DataAnnotations có thể dùng response 400 mặc định của MVC.
-
-Với POST, PUT, PATCH và DELETE đã qua bước kiểm tra quyền, `TransactionMiddleware` mở transaction trước khi MVC bind và validate dữ liệu. POST login cũng đi qua middleware này. GET bỏ qua transaction.
-
-```mermaid
-flowchart TD
-    A["Request ghi"] --> B["Mở transaction và giữ response"]
-    B --> C["MVC → Controller → Service → Repository"]
-    C --> D{"HTTP status >= 400?"}
-    D -->|"Có"| E["Rollback"]
-    D -->|"Không"| F["SaveChangesAsync rồi commit"]
-    E --> G["Gửi response"]
-    F --> G
+```text
+API ------------> Infrastructure ----------> UseCase
+ |                 |    |                      |   |
+ +--> UseCase      |    +--> Contract <---------+   |
+                   +-------> Domain <--------------+
+Domain và Contract không tham chiếu project khác trong solution.
 ```
 
-`Add`, `Update` và `Remove` chuẩn bị thay đổi trong EF. Middleware gọi `IUnitOfWork.SaveChangesAsync` để ghi thay đổi, sau đó commit để hoàn tất transaction. Khi có exception, transaction chưa commit được giải phóng trước khi `ExceptionHandlingMiddleware` trả lỗi. Nếu gọi service ngoài pipeline HTTP này, cần một nơi chịu trách nhiệm lưu dữ liệu. Khi trả `Result` lỗi, ánh xạ sang HTTP status phù hợp. Truy cập `Value` của `Result<T>` thất bại sẽ ném exception.
+- Đặt HTTP binding, authorization, filter, middleware và cấu hình ghép ứng dụng trong API.
+- Đặt DTO theo phiên bản, Result và kiểu phân trang dùng chung trong Contract.
+- Đặt entity, hằng số nghiệp vụ, enum và domain exception trong Domain.
+- Đặt business service, validation, mapping và interface cho persistence/security/cache trong UseCase.
+- Triển khai các interface đó, EF mapping, migration, JWT, băm mật khẩu và truy cập Redis trong Infrastructure.
+- CẤM Domain tham chiếu Contract, UseCase, Infrastructure hoặc API.
+- CẤM Contract tham chiếu Domain, UseCase, Infrastructure hoặc API.
+- CẤM UseCase tham chiếu Infrastructure hoặc API; CẤM Infrastructure tham chiếu API.
+- Kiểm tra các ranh giới bằng `tests/INuStore.Tests/ArchitectureTests.cs`.
+- Giữ dependency EF hiện có trong Contract (`PagedResult<T>.CreateAsync`) và UseCase; không mô tả hai project này là hoàn toàn độc lập với thư viện persistence.
+- Gọi service trực tiếp từ controller. `Command`/`Query` là các kiểu chứa DTO, không phải MediatR handler. Code hiện tại không có MediatR, Mapster, bộ điều phối domain event hay triển khai Specification.
 
-Middleware, repository và unit of work dùng chung `ApplicationDbContext` của request. Hãy `await` lần lượt các thao tác trên context này, kể cả truy vấn `AsNoTracking()`. `FindAll` dùng no tracking, còn `FindByIdAsync` và `FindSingleAsync` bật tracking. `GetUserWithRolesAsync` tải quan hệ bằng `Include` và `ThenInclude`. Lazy loading đang tắt. [Quy tắc dùng DbContext của EF Core](https://learn.microsoft.com/en-us/ef/core/dbcontext-configuration/#avoiding-dbcontext-threading-issues)
+## 3. Bản đồ repository
 
-`EFUnitOfWork` chuyển lỗi SQL Server đã nhận diện sang lỗi nghiệp vụ qua `SqlServerExceptionTranslator`, hiện gồm trùng tên role và xóa role đang được gán. Translator đọc mã lỗi, tên constraint trong thông báo và trạng thái entity. Lỗi gốc được giữ trong `InnerException`. Lỗi chưa nhận diện được ném tiếp. Code seed gọi trực tiếp context nên đi ngoài bước chuyển lỗi này. Cấu hình retry được kiểm tra lúc khởi động, nhưng chiến lược retry SQL hiện đang tắt.
+| Nội dung cần thêm/sửa | Vị trí / ví dụ |
+| --- | --- |
+| Entity hoặc quy tắc nghiệp vụ | `src/INuStore.Domain/Entities/Identity/Permission.cs`, `Exceptions/PermissionException.cs` |
+| DTO request/response | `src/INuStore.Contract/Service/V1/Permission/{Command,Query,Response}.cs` |
+| Service hoặc interface | `src/INustore.UseCase/UseCases/V1/PermissionService/PermissionService.cs`, `Abstractions/Services/IPermissionService.cs` |
+| Validator | `src/INustore.UseCase/UseCases/V1/PermissionService/Validators/PermissionValidator.cs` |
+| AutoMapper profile | `src/INustore.UseCase/Mappings/PermissionProfile.cs` |
+| Interface repository | `src/INustore.UseCase/Abstractions/Repositories/IPermissionRepository.cs` |
+| Triển khai repository | `src/INuStore.Infrastructure/Repositories/PermissionRepository.cs` |
+| Cấu hình EF model | `src/INuStore.Infrastructure/Configurations/PermissionConfiguration.cs` |
+| Migration | `src/INuStore.Infrastructure/Migrations/` |
+| Controller | `src/INuStore.API/Controllers/PermissionController.cs` |
+| Ví dụ HTTP | `src/INuStore.API/INuStore.API.http` |
+| Unit test cho service | `tests/INuStore.UnitTets/UseCase/PermissionService/PermissionServiceTests.cs` |
+| Test kiến trúc | `tests/INuStore.Tests/ArchitectureTests.cs` |
 
-Middleware xử lý lỗi trả JSON gồm `title`, `status`, `detail` và `errors`. Sai thông tin đăng nhập trả 401, lỗi yêu cầu nghiệp vụ trả 400, không tìm thấy trả 404, lỗi định dạng trả 422. UseCase `ValidationException` hiện thuộc nhánh 500. `detail` lấy từ `exception.Message`, vì vậy hãy giữ dữ liệu nhạy cảm ngoài thông báo lỗi.
+Giữ nguyên cách viết đường dẫn `INustore.UseCase` và `INuStore.UnitTets`; root namespace của UseCase là `INuStore.UseCase`.
+Đăng ký dependency qua `DependencyInjection/Extensions/ServiceCollectionExtensions.cs` của từng tầng.
 
-## Auth, user và role hiện hoạt động ra sao
+## 4. Các lệnh làm việc
 
-- **Đăng nhập.** `POST /api/v1/Auth/Login` tìm user theo tên và kiểm tra mật khẩu bằng BCrypt. Sai mật khẩu và không có user cùng trả 401. Thành công trả access token HS256 chứa ID, tên user, email và một refresh token ngẫu nhiên. Hiện chưa lưu refresh token hoặc có endpoint dùng refresh token.
-- **Kiểm tra quyền.** `AddApi` đăng ký JWT Bearer. `WebApplication` tự thêm middleware authentication và `Program.cs` gọi `UseAuthorization()`. `GetUserById` áp dụng policy `allow-gmail`, yêu cầu đăng nhập và email kết thúc bằng `@gmail.com`. `GetAllUsers`, CRUD role và các API gán role yêu cầu đăng nhập. Login và các action tạo, sửa, xóa user chưa có yêu cầu authorization. JWT kiểm tra hạn dùng và khóa ký. Kiểm tra issuer và audience đang tắt. [Cách ASP.NET Core thêm middleware](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-10.0#middleware-added-automatically-by-webapplication)
-- **User CRUD.** `CreateUser` tạo một user và ghi đè giá trị tạm mà `UserProfile` map vào `PasswordHash` bằng kết quả băm BCrypt trước khi thêm entity. Giữ mật khẩu và hash ngoài DTO trả về. `GetAllUsers` vẫn lấy toàn bộ danh sách dù nhận tham số phân trang. `GetUserById` yêu cầu `UserId > 7` và trả 404 nếu thiếu user. Update yêu cầu ID dương. Update và delete trả thành công khi không tìm thấy user. Lookup trong delete hiện chưa truyền cancellation token.
-- **Role CRUD.** Các action dưới `/api/v1/Role/` trả HTTP 200 cùng `Result` khi thành công. Danh sách sắp theo ID. DTO role chỉ trả thông tin role. Tên role được trim, bắt buộc có giá trị và dài tối đa 256 ký tự. Role có sẵn trong `RoleType` chỉ đổi được mô tả. Role đã gán cho user không được xóa. Ràng buộc tên duy nhất và khóa ngoại cần migration `20261109132818_ProtectRoleNamesAndAssignments`. Xử lý tên trùng trong database trước khi áp dụng.
-- **Gán và gỡ một role.** `GET /api/v1/User/{userId}/roles` trả role sắp theo tên. Dùng `PUT` hoặc `DELETE` với `/api/v1/User/{userId}/roles/{roleId}` để gán hoặc gỡ. Các ID phải dương. Khi gán hoặc gỡ, thiếu user hoặc role trả 404. Gửi lại cùng yêu cầu sau khi trạng thái đã đúng vẫn thành công.
-- **Thay toàn bộ role.** `PUT /api/v1/User/{userId}/roles` kiểm tra ID trên route và danh sách `roleIds` trong body. Danh sách phải có ít nhất một ID dương và mọi ID đều phải dương. Code hiện lấy các role tìm được để thêm và dùng danh sách gửi lên để tính role cần xóa. Nếu một ID không tồn tại, request vẫn có thể thành công và chỉ lưu một phần danh sách, thậm chí gỡ hết role cũ. Thiếu user trả 404. Các request thay role đồng thời chưa được tuần tự hóa.
-
-## Chạy local và xem API
-
-Chạy trong thư mục gốc bằng .NET 10 SDK.
+Chạy PowerShell từ thư mục gốc repository. Dùng .NET SDK hỗ trợ `net10.0` và `.slnx`.
+Repository chưa có `global.json`, `Directory.Packages.props` tập trung, local tool manifest, Dockerfile, Compose hay CI pipeline được đưa vào quản lý phiên bản.
+Phiên bản package nằm trong từng `.csproj`. Không tự đặt ra lệnh Docker hoặc CI khi chưa có cấu hình tương ứng.
 
 ```powershell
+# Restore, build rồi chạy toàn bộ test theo thứ tự
 dotnet restore INuStore.slnx
 dotnet build INuStore.slnx --no-restore
 dotnet test INuStore.slnx --no-build
-dotnet run --project src/INuStore.API --launch-profile https
-```
 
-Profile HTTPS dùng `https://localhost:7005` và `http://localhost:6000` trong môi trường Development. Mở `/swagger/index.html` hoặc dùng [file .http](src/INuStore.API/INuStore.API.http). Trong Swagger, dán access token vào Authorize. Swagger tự thêm tiền tố `Bearer`. Development hiện gọi `MapOpenApi()` nhưng phần đăng ký service chưa có `AddOpenApi()`. Cần kiểm tra startup khi sửa phần OpenAPI hoặc cấu hình khởi động.
+# Chạy một test project / một test
+dotnet test tests/INuStore.UnitTets/INuStore.UnitTets.csproj --no-build
+dotnet test tests/INuStore.Tests/INuStore.Tests.csproj --no-build --filter "FullyQualifiedName~Domain_Should_Not_Depend_On_Other_Layers"
 
-- `/health/live` kiểm tra API có phản hồi.
-- `/health/ready` kiểm tra kết nối SQL Server qua EF, với thời gian chờ năm giây.
-- Hai endpoint dùng được khi chưa đăng nhập và không có tiền tố version. Kết quả mặc định là text, `200 Healthy` hoặc `503 Unhealthy`. Readiness kiểm tra kết nối, còn schema cần được kiểm tra riêng.
+# Chỉ kiểm tra định dạng; xem các lỗi sẵn có trước khi chạy lệnh sửa định dạng
+dotnet format INuStore.slnx --verify-no-changes --no-restore
 
-Đặt chuỗi kết nối ở `ConnectionStrings:ConnectionStrings` hoặc qua biến môi trường `ConnectionStrings__ConnectionStrings`. Cấu hình JWT nằm trong `JwtOption`. Giữ thông tin đăng nhập, khóa ký và token thật ngoài source và log. EF đang bật detailed errors và sensitive-data logging. Serilog ghi ra console và file theo ngày trong `logs/`.
+# API chạy Development; cần cấu hình SQL Server và Redis
+dotnet run --project src/INuStore.API/INuStore.API.csproj --launch-profile https
 
-## Thay đổi database
+# Dùng phiên bản công cụ tương ứng EF Core 10.0.14
+dotnet ef --version
+# Chỉ chạy khi việc cài/cập nhật công cụ đã được cho phép:
+dotnet tool install --global dotnet-ef --version 10.0.14
 
-Infrastructure chứa migration. API cung cấp cấu hình khởi động cho EF Tool. Dùng `ApplicationDbContext` và kiểm tra `dotnet ef --version` để chọn tool cùng phiên bản chính với EF Core 10. Trong Development, API gọi extension `ApplyMigrationsAsync` của Infrastructure trước khi cấu hình pipeline. Extension dùng `Database.MigrateAsync` để tạo database theo connection string nếu chưa có và áp dụng các migration còn thiếu. SQL Server phải truy cập được; tài khoản kết nối cần quyền tạo database và thay đổi schema tương ứng. Nếu migration lỗi, API dừng khởi động. Các môi trường khác vẫn áp dụng migration qua lệnh hoặc script triển khai riêng.
-
-```powershell
+# Chỉ tạo sau khi thay đổi schema được duyệt; thay DescribeSchemaChange bằng tên có ý nghĩa
 dotnet ef migrations add DescribeSchemaChange --project src/INuStore.Infrastructure --startup-project src/INuStore.API --context ApplicationDbContext -- --environment Development
+# Chỉ áp dụng sau khi xác nhận đúng database đích trong cấu hình
 dotnet ef database update --project src/INuStore.Infrastructure --startup-project src/INuStore.API --context ApplicationDbContext -- --environment Development
 ```
 
-Lệnh đầu sinh file để review cùng model snapshot. Lệnh sau áp dụng thay đổi vào database đã chọn. Xác nhận đúng database trước khi chạy lệnh sau. Hướng dẫn cho terminal và Package Manager Console nằm trong [tài liệu migration](technical-docs/5.ef-core-migrations.MD).
+- Kiểm tra kết quả thực tế của từng lệnh; cú pháp và đường dẫn đúng không chứng minh build hoặc kiểm tra runtime đã thành công.
+- Cả hai launch profile đều dùng Development. HTTPS dùng `https://localhost:7005` và `http://localhost:6000`; HTTP dùng cổng 6000.
+- Swagger UI ở `/swagger/index.html`; `/` chuyển hướng đến đó (`SwaggerExtensions.cs`). Dán access token nguyên bản vào Authorize.
+- Development chạy `ApplyMigrationsAsync` trước khi nhận request; khởi động có thể tạo/cập nhật database được cấu hình. Xác nhận database đích trước.
+- Các môi trường khác cần triển khai schema riêng. Review migration cùng snapshot; script SQL triển khai nằm trong `deployment/sql/`.
 
-## Khi sửa và bàn giao
+## 5. Quy ước viết code
 
-- Đọc source sở hữu hành vi trước khi sửa. Bổ sung contract, service, validator, mapping, controller và DI ở đúng project khi cần. Cập nhật ví dụ `.http` khi đổi endpoint.
-- Dùng [.editorconfig](.editorconfig) làm chuẩn trình bày. C# dùng thụt lề bốn dấu cách, file-scoped namespace và dấu ngoặc nhọn trên dòng riêng. Tên type và member public dùng PascalCase, interface bắt đầu bằng `I`, biến và tham số dùng camelCase, field riêng dùng `_camelCase`. Truyền cancellation token cho I/O bất đồng bộ.
-- Chỉ tạo, sửa hoặc xóa file test khi người dùng yêu cầu rõ. Khi sửa code, build rồi chạy test sẵn có nếu liên quan. Hiện có tám test, gồm bốn test kiến trúc, ba test login và một test middleware. Muốn xác nhận startup, SQL Server, health check hoặc transaction thì cần kiểm tra riêng. Khi chỉ sửa tài liệu, kiểm tra nội dung, đường dẫn và mục hiển thị trong solution.
-- Báo lệnh đã chạy, lỗi, warning và giới hạn xác minh khi bàn giao. Giữ các cảnh báo dependency và bảo mật. `Directory.Build.props` đang có ngoại lệ tạm cho một advisory AutoMapper. Giữ build output, log và test result ngoài Git.
-- Viết commit bằng động từ chỉ hành động. Khi tạo PR, giải thích hành vi thay đổi, kiểm tra đã làm, cấu hình hoặc migration liên quan, và ví dụ request/response nếu đổi API.
+- Theo `.editorconfig`: thụt bốn dấu cách, CRLF cho C#, file-scoped namespace, System using đứng trước và cách đặt dấu ngoặc hiện có.
+- Dùng PascalCase cho type/public member, tiền tố `I` cho interface, camelCase cho tham số/biến cục bộ và `_camelCase` cho private field. Đặt tên theo nghiệp vụ, dùng biến trung gian dễ hiểu.
+- Giữ nullable reference type và implicit using được bật như các `.csproj` hiện tại.
+- Await thao tác I/O; truyền `CancellationToken` từ controller qua service đến repository. Không chặn luồng bằng `.Result` hoặc `.Wait()`.
+- Await tuần tự mọi thao tác dùng chung DbContext, kể cả query không tracking. Không làm theo comment trái với quy tắc này trong `UserService.ReplaceUserRoles`.
+- Đặt validation request trong FluentValidation validator của UseCase; gắn `[Validate<TModel>]` cho từng model route/query/body được bind. Tránh kiểm tra trực tiếp trong controller và DataAnnotations trên request.
+- Giữ response lỗi binding mặc định của `[ApiController]`. `ValidationFilter.cs` trả 400 với lỗi đã loại trùng và dùng `RequestAborted`.
+- Dùng Contract DTO ở biên HTTP; mapping qua AutoMapper profile. Không trả đồ thị navigation của entity, mật khẩu hoặc password hash.
+- Giữ Result envelope cho response thành công. Ánh xạ thất bại sang HTTP status phù hợp; đọc `Result<T>.Value` khi thất bại sẽ ném exception (`ResultT.cs`).
+- Dùng domain exception theo cách xử lý lỗi nghiệp vụ hiện có. `ExceptionHandlingMiddleware.cs` ánh xạ bad request thành 400, không tìm thấy thành 404, conflict/concurrency thành 409, thông tin đăng nhập/token không hợp lệ thành 401 và lỗi định dạng thành 422.
+- Exception chưa được ánh xạ, gồm UseCase `ValidationException`, hiện trả 500. Không tự ý đổi hợp đồng lỗi. Không đưa bí mật vào thông báo exception.
+- Dùng `ILogger<T>` qua DI và message template có cấu trúc. `Program.cs` cấu hình Serilog; appsettings cấu hình ghi console và file hằng ngày trong `logs/`.
+- Giữ lifetime: service User/Role/Permission là scoped; Auth, repository, unit of work, service hash/token/cache là transient; permission authorization handler là singleton.
+- Giữ `TransactionMiddleware` là scoped và `ExceptionHandlingMiddleware` là transient. Không inject dependency scoped vào permission handler singleton.
+- Để cơ chế quét assembly tự tìm validator, kể cả kiểu internal, và AutoMapper profile trong UseCase.
+- Giữ quy tắc dự án: không viết XML comment `summary`/`inheritdoc`; chỉ dùng `[ProducesResponseType]` cho HTTP 200.
+- Tuân thủ cấu hình diagnostic trong `.editorconfig`. Chưa có package StyleCop/SonarAnalyzer được tham chiếu trực tiếp; tên rule trong cấu hình không chứng minh analyzer đã được cài.
 
-Dùng Microsoft Learn MCP trong [.codex/config.toml](.codex/config.toml) để tra tài liệu chính thức. Sau khi clone, trust project và mở lại Codex để tải cấu hình. Kiểm tra server bằng `codex mcp list`.
+## 6. Quy trình triển khai tính năng
+
+Lấy tính năng Permission làm ví dụ cho mô hình service hiện có; chỉ sửa những tầng cần thiết.
+
+1. Xác định hành vi yêu cầu, quyền truy cập, contract và phạm vi schema trước khi sửa.
+2. Domain: thêm entity/quy tắc/exception cạnh `Entities/Identity/Permission.cs` và `Exceptions/PermissionException.cs`.
+3. Contract/UseCase: định nghĩa DTO cạnh `Service/V1/Permission/Command.cs`; thêm service interface, validator, mapping và luồng nghiệp vụ theo `PermissionService.cs`.
+4. Infrastructure: triển khai thao tác repository cạnh `PermissionRepository.cs`; cập nhật `ApplicationDbContext`/cấu hình entity khi cần. Chỉ ghi nhận thay đổi vào EF, không lưu ngay trong repository.
+5. Sau khi thay đổi schema được duyệt, tạo migration mới bằng lệnh ở trên; review các thao tác và snapshot được sinh. Không viết lại migration cũ.
+6. API: thêm binding và validation attribute theo `PermissionController.cs`; chỉ định authorization và giữ route theo phiên bản qua `ApiController.cs`.
+7. Đăng ký interface qua DI extension hiện có; cập nhật ví dụ request/response trong `.http` và tài liệu liên quan.
+8. Test: chạy các test hiện có liên quan. Chỉ thêm/sửa file test khi người dùng yêu cầu rõ; khi được phép, theo `PermissionServiceTests.cs`.
+9. Build, chạy test, kiểm tra diff và báo giới hạn xác minh. Kiểm tra runtime/database khi hành vi thay đổi cần đến chúng và database đích đã được cho phép.
+
+## 7. Quy tắc kiểm thử
+
+- Dùng stack xUnit 2.9.3 và Moq 4.20.72 hiện có. Cả hai test project dùng Microsoft.NET.Test.Sdk và coverlet; `INuStore.Tests` còn dùng NetArchTest.
+- Đặt kiểm tra kiến trúc trong `INuStore.Tests`; đặt test hành vi service độc lập trong `INuStore.UnitTets/UseCase/`.
+- Đặt tên như `CreatePermission_WhenNameExists_ShouldThrowException`; test kiến trúc dùng dạng `Domain_Should_Not_Depend_On_Other_Layers`.
+- Khi được yêu cầu sửa test, bao phủ nhánh thành công bị ảnh hưởng, lỗi nghiệp vụ liên quan và tác động mong đợi lên repository; dùng mock theo test service hiện có.
+- Code hiện có bốn test `[Fact]` cho kiến trúc và bốn test `[Fact]` cho service. Chưa cấu hình Testcontainers, WebApplicationFactory hay integration-test host.
+- Không khẳng định unit test đã xác minh SQL constraint, transaction middleware, startup, Redis hoặc health endpoint. Kiểm tra với dependency thực khi cần.
+- Build trước khi dùng `--no-build`; chạy toàn bộ test solution trước khi hoàn tất thay đổi triển khai. Với tài liệu, kiểm tra đường dẫn, lệnh và đối chiếu code; báo kết quả build/test hoặc nguyên nhân bị chặn.
+
+## 8. Ranh giới thao tác
+
+**Luôn thực hiện**
+
+- Đọc code chịu trách nhiệm, tuân thủ ranh giới tầng và mô hình service hiện có, giữ thay đổi không liên quan và giới hạn diff.
+- Chạy build và test hiện có khi thay đổi triển khai; báo đầy đủ lỗi và cảnh báo.
+- Giữ thao tác ghi trong ranh giới lưu dữ liệu hiện có và validate mọi request model mới.
+
+**Hỏi trước**
+
+- Xin phép trước khi thêm NuGet package, đổi public API contract, đổi schema hoặc quy tắc kiến trúc, trừ khi yêu cầu hiện tại đã cho phép thay đổi đó.
+- Xác nhận database đích trước khi áp dụng migration hoặc chạy Development với connection chưa quen thuộc.
+- Chỉ tạo, sửa hoặc xóa file test khi người dùng cho phép rõ ràng.
+
+**Không bao giờ**
+
+- Commit bí mật, bỏ qua ranh giới tầng, tắt analyzer, mở rộng audit suppression hoặc force-push.
+- Sửa tay output được sinh (`bin/`, `obj/`, migration designer/snapshot) hay migration cũ; để EF sinh các file migration mới.
+- Sửa `.agents/`, `.codex/`, `.aws/`, cấu hình không liên quan, script triển khai hoặc migration lịch sử như một phần dọn dẹp ngoài phạm vi.
+- Dùng ví dụ lỗi thời trong `technical-docs/` hoặc `AGENTS-VN.md` làm bằng chứng cho hành vi hiện tại.
+
+## 9. Bảo mật và cấu hình
+
+- Cấp SQL qua `ConnectionStrings__ConnectionStrings`, Redis qua `ConnectionStrings__Redis`, JWT qua `JwtOption__SecretKey`, `JwtOption__Issuer`, `JwtOption__Audience`, `JwtOption__ExpireMin`.
+- Không đưa credential, key, token hay hash thật vào appsettings được commit, ví dụ, log hoặc output của agent. Chưa cấu hình `UserSecretsId`; xin phép trước khi thêm cấu hình project cho user-secrets.
+- Giữ BCrypt qua `IPasswordHasher` và sinh HS256 qua `IJwtTokenService`. AuthController có các action anonymous Register/Login/RefreshToken/RevokeToken kèm validation.
+- Đọc authorization metadata của từng action: PermissionController chỉ dành cho Admin; RoleController có các yêu cầu role khác nhau; UserController kết hợp permission, Gmail policy, yêu cầu đăng nhập và action chưa bảo vệ. Không có fallback policy bảo vệ action thiếu attribute.
+- JWT validation hiện kiểm tra thời hạn/chữ ký, clock skew bằng 0 nhưng tắt kiểm tra issuer/audience (`JwtExtensions.cs`). Review rõ ràng các thay đổi bảo mật.
+- Permission handler so khớp chính xác claim và chấp nhận khi có bất kỳ permission nào được yêu cầu (`PermissionAuthorizationHandler.cs`). Giữ tên đồng bộ với `Domain/Constants/Permissions.cs`.
+- Phiên refresh được cache theo username, hết hạn sau năm phút. Revoke xóa trạng thái Redis nhưng không đưa access JWT đã phát hành vào blacklist. Refresh giữ authorization claim từ JWT được gửi lên.
+- Infrastructure đang bật EF sensitive-data logging và detailed errors. Review trước khi triển khai production; không để lộ nội dung nhạy cảm qua exception/log.
+- Giữ suppression giới hạn cho advisory AutoMapper trong `Directory.Build.props`; giữ các cảnh báo dependency/bảo mật khác.
+- Khi cần tài liệu .NET chính thức, dùng Microsoft Learn MCP đã cấu hình trong `.codex/config.toml`; giữ cấu hình công cụ trong phạm vi repository này.
+
+## 10. Điều kiện hoàn tất
+
+- [ ] Chỉ triển khai hành vi được cho phép; giữ ranh giới dependency và các thay đổi không liên quan.
+- [ ] Build thành công, các test liên quan và toàn bộ test solution đều đạt đối với thay đổi triển khai.
+- [ ] Không thêm cảnh báo mới; báo chính xác cảnh báo có sẵn, lỗi và kiểm tra bị môi trường chặn.
+- [ ] Sinh/review migration mới cùng snapshot nếu thay đổi schema đã duyệt cần đến; xác nhận database đích trước khi áp dụng.
+- [ ] Cập nhật ví dụ `.http` và tài liệu liên quan khi đổi endpoint/cấu hình.
+- [ ] Kiểm tra diff để loại bí mật, output build, log và thay đổi định dạng ngoài ý muốn.
+- [ ] Báo các lệnh đã chạy; phân biệt đối chiếu source, kiểm tra bằng unit test và kiểm tra runtime.
+
+## 11. Các điểm dễ mắc lỗi
+
+- `Program.cs` đặt exception handling trước authorization và transaction middleware; Development cũng đăng ký/map OpenAPI. Không lặp lại thông tin thiếu `AddOpenApi` của hướng dẫn cũ.
+- `AddDbContextPool<DbContext, ApplicationDbContext>` đăng ký context dùng chung. Repository, transaction middleware và EFUnitOfWork nhận concrete context; kiểm tra DI resolution khi kiểm tra startup, không coi build thành công là bằng chứng khởi tạo được các dependency.
+- Transaction middleware mở SQL transaction cho POST/PUT/PATCH/DELETE, kể cả login/refresh/revoke, trước MVC binding/validation. Middleware giữ response trong bộ đệm, rollback khi HTTP >=400; trường hợp khác sẽ save và commit trước khi chép response ra ngoài.
+- Result thất bại nhưng trả HTTP 200 vẫn dẫn đến commit. Để middleware sở hữu việc save/commit; caller ngoài HTTP cần ranh giới lưu dữ liệu rõ ràng.
+- `EFUnitOfWork.cs` hiện gọi SaveChangesAsync trực tiếp; không có SQL exception translator. Không dựa vào tài liệu dịch lỗi cũ để suy ra response cho lỗi trùng dữ liệu/khóa ngoại.
+- `RepositoryBase.FindAll` không tracking; `FindByIdAsync` và `FindSingleAsync` bật tracking. Lazy-loading proxy bị tắt; chủ động tải navigation cần dùng.
+- `UserService` vẫn tải toàn bộ user dù nhận tham số phân trang; validation lấy theo ID yêu cầu ID >7. Update/delete user không tồn tại vẫn thành công; delete chưa truyền cancellation token vào lookup. Xác nhận ý định trước khi đổi hành vi.
+- `ReplaceUserRoles` bỏ qua ID không tồn tại khi thêm, nhưng xóa role dựa trên danh sách gửi lên; có thể thay một phần hoặc xóa hết assignment mà vẫn thành công. Các yêu cầu thay thế đồng thời chưa được tuần tự hóa.
+- `AuthService` truy vấn permission claim hai lần khi login. Thao tác cache refresh/login/revoke chưa nguyên tử; TODO trong source đề cập Redis transaction/Lua. Không khẳng định xoay phiên đồng thời đã an toàn.
+- Xóa cache theo prefix chỉ theo dõi key trong static dictionary của từng process (`Caching/CacheService.cs`); không liệt kê được toàn bộ key giữa nhiều instance.
+- Readiness chỉ kiểm tra kết nối SQL với timeout năm giây; liveness loại dependency (`HealthCheckExtensions.cs`). Readiness không kiểm tra Redis hoặc độ tương thích schema.

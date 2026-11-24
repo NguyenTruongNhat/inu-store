@@ -175,9 +175,9 @@ Mục tiêu: Ôn tập distributed caching và cache consistency.
 
 ### Phase 09 — Message Queue & Event-Driven
 
-Mục tiêu: Tích hợp KafKa và xử lý bất đồng bộ.
+Mục tiêu: Tích hợp RabbitMQ và xử lý bất đồng bộ.
 
-- [x] **9.1** Tích hợp KafKa.
+- [ ] **9.1** Tích hợp RabbitMQ.
 - [ ] **9.2** Xây dựng Message Publisher.
 - [ ] **9.3** Xây dựng Message Consumer.
 - [ ] **9.4** Publish event khi User đăng ký.
@@ -187,7 +187,7 @@ Mục tiêu: Tích hợp KafKa và xử lý bất đồng bộ.
 - [ ] **9.8** Thiết lập Message Retry.
 - [ ] **9.9** Thiết lập Dead Letter Queue (DLQ).
 - [ ] **9.10** Xử lý duplicate message bằng Idempotency.
-- [ ] **9.11** Xử lý lỗi và reconnect khi KafKa mất kết nối.
+- [ ] **9.11** Xử lý lỗi và reconnect khi RabbitMQ mất kết nối.
 - [ ] **9.12** Quản lý acknowledgment và prefetch.
 - [ ] **9.13** Xây dựng Transactional Outbox Pattern.
 - [ ] **9.14** Theo dõi trạng thái xử lý message.

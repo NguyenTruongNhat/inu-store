@@ -1,12 +1,11 @@
 ﻿using System.Security.Claims;
 using INuStore.Contract.Abstractions.Share;
-using INuStore.Contract.Messaging.V1;
 using INuStore.Contract.Service.V1.Auth;
 using INuStore.Domain.Entities.Identity;
 using INuStore.Domain.Enums;
 using INuStore.Domain.Exceptions;
 using INuStore.UseCase.Abstractions.Caching;
-using INuStore.UseCase.Abstractions.Messaging;
+using INuStore.UseCase.Abstractions.Notifications;
 using INuStore.UseCase.Abstractions.Security;
 using INuStore.UseCase.Abstractions.Services;
 using INuStore.UseCase.Abstractions.UnitOfWork;
@@ -20,15 +19,15 @@ public class AuthService : IAuthService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ICacheService _cacheService;
-    private readonly IUserLoginEventPublisher _userLoginEventPublisher;
+    private readonly IEmailSender _emailSender;
 
-    public AuthService(IJwtTokenService jwtTokenService, IUnitOfWork unitOfWork, IPasswordHasher passwordHasher, ICacheService cacheService, IUserLoginEventPublisher userLoginEventPublisher)
+    public AuthService(IJwtTokenService jwtTokenService, IUnitOfWork unitOfWork, IPasswordHasher passwordHasher, ICacheService cacheService, IEmailSender emailSender)
     {
         _jwtTokenService = jwtTokenService;
         _unitOfWork = unitOfWork;
         _passwordHasher = passwordHasher;
         _cacheService = cacheService;
-        _userLoginEventPublisher = userLoginEventPublisher;
+        _emailSender = emailSender;
     }
 
 
@@ -87,7 +86,8 @@ public class AuthService : IAuthService
         var response = CreateTokens(claims);
         await StoreTokensAsync(user.UserName, response, cancellationToken);
 
-        await _userLoginEventPublisher.PublishAsync(new UserLoggedIn(Guid.NewGuid(), user.Id, user.UserName, user.Email, DateTimeOffset.UtcNow), cancellationToken);
+        //send email notification to user
+        await _emailSender.SendEmailAsync(user.Email, "Welcome!", "Thank you for registering.");
 
         return Result.Success(response);
     }

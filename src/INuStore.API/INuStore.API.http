@@ -57,13 +57,6 @@ Content-Type: application/json
 { "userName": "third-customer", "email": "NEW-CUSTOMER@example.com", "password": "ExamplePassword123" }
 
 ### Login: 200; Redis key is the database username, TTL is 300 seconds
-# Successful login publishes UserLoggedIn to Kafka; it no longer sends email directly.
-# Start the consumer first (PowerShell):
-# dotnet run --project C:/NhatNguyen/my-project/INuStore/src/INuStore.NotificationWorker -- --environment Development
-# Visual Studio: select the INuStore.NotificationWorker launch profile, which sets DOTNET_ENVIRONMENT=Development.
-# Kafka:BootstrapServers defaults to localhost:9092 in Development; override with Kafka__BootstrapServers.
-# Watch matching MessageId values in API and Worker logs. Kafka failure is logged and login continues.
-# This learning demo has no outbox: events can be lost or processed more than once.
 POST {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/Auth/Login
 Content-Type: application/json
 

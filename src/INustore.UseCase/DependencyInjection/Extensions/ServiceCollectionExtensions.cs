@@ -33,4 +33,8 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddAppValidators(this IServiceCollection services)
     => services.AddValidatorsFromAssembly(UseCase.AssemblyReference.Assembly, includeInternalTypes: true);
+
+    public static IServiceCollection AddNotificationWorkerUseCase(
+        this IServiceCollection services)
+        => services.AddScoped<PendingNotificationService>();
 }

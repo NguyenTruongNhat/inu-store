@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Nodes;
+using INuStore.API.Filters;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
-using INuStore.API.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace INuStore.API.DependencyInjection.Options;

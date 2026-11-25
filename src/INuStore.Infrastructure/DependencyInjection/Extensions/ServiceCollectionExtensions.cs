@@ -125,4 +125,22 @@ public static class ServiceCollectionExtensions
     }
 
 
+    public static IServiceCollection AddNotificationWorkerInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.ConfigureSqlServerRetryOptions(configuration.GetSection(nameof(SqlServerRetryOptions)));
+
+        services.AddSqlConfiguration();
+        services.AddRepositoryBaseConfiguration();
+        services.AddTransient<IEmailSender, ResendEmailSender>();
+
+        services.AddOptions<ResendOptions>()
+            .Bind(configuration.GetSection(ResendOptions.SectionName))
+            .Validate(options => !string.IsNullOrWhiteSpace(options.ApiKey), "Resend API key is required.")
+            .Validate(options => !string.IsNullOrWhiteSpace(options.From), "Resend sender address is required.")
+            .ValidateOnStart();
+
+        return services;
+    }
+
+
 }

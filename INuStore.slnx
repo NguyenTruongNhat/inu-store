@@ -46,6 +46,7 @@
     <Project Path="src/INuStore.Contract/INuStore.Contract.csproj" />
     <Project Path="src/INuStore.Domain/INuStore.Domain.csproj" />
     <Project Path="src/INuStore.Infrastructure/INuStore.Infrastructure.csproj" />
+    <Project Path="src/INuStore.NotificationWorker/INuStore.NotificationWorker.csproj" Id="030c99ba-8366-495f-9069-4f2f2f777def" />
     <Project Path="src/INustore.UseCase/INustore.UseCase.csproj" />
   </Folder>
   <Folder Name="/tests/">

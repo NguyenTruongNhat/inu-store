@@ -10,6 +10,7 @@ using INuStore.UseCase.Abstractions.Security;
 using INuStore.UseCase.Abstractions.Services;
 using INuStore.UseCase.Abstractions.UnitOfWork;
 using INuStore.UseCase.Exceptions;
+using INuStore.UseCase.UseCases.V1.NotificationService;
 
 namespace INuStore.UseCase.UseCases.V1.AuthService;
 
@@ -19,15 +20,15 @@ public class AuthService : IAuthService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ICacheService _cacheService;
-    private readonly IEmailSender _emailSender;
+    private readonly FirstLoginNotificationService _firstLoginNotificationService;
 
-    public AuthService(IJwtTokenService jwtTokenService, IUnitOfWork unitOfWork, IPasswordHasher passwordHasher, ICacheService cacheService, IEmailSender emailSender)
+    public AuthService(IJwtTokenService jwtTokenService, IUnitOfWork unitOfWork, IPasswordHasher passwordHasher, ICacheService cacheService, FirstLoginNotificationService firstLoginNotificationService)
     {
         _jwtTokenService = jwtTokenService;
         _unitOfWork = unitOfWork;
         _passwordHasher = passwordHasher;
         _cacheService = cacheService;
-        _emailSender = emailSender;
+        _firstLoginNotificationService = firstLoginNotificationService;
     }
 
 
@@ -55,7 +56,8 @@ public class AuthService : IAuthService
         {
             UserName = userName,
             Email = email,
-            PasswordHash = _passwordHasher.Hash(request.Password)
+            PasswordHash = _passwordHasher.Hash(request.Password),
+            CreatedAtUtc = DateTime.UtcNow
         };
         user.UserRoles.Add(new UserRole { User = user, RoleId = customerRole.Id });
         _unitOfWork.UserRepository.Add(user);
@@ -87,8 +89,7 @@ public class AuthService : IAuthService
         await StoreTokensAsync(user.UserName, response, cancellationToken);
 
         //send email notification to user
-        await _emailSender.SendEmailAsync(user.Email, "Welcome!", "Thank you for registering.");
-
+        await _firstLoginNotificationService.ScheduleAsync(user, cancellationToken);
         return Result.Success(response);
     }
 

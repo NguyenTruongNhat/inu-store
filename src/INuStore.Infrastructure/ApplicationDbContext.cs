@@ -1,4 +1,5 @@
-﻿using INuStore.Domain.Entities.Identity;
+﻿using INuStore.Domain.Entities;
+using INuStore.Domain.Entities.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace INuStore.Infrastructure;
@@ -15,5 +16,6 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 
 }

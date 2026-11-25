@@ -24,11 +24,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.ConfigureSqlServerRetryOptions(configuration.GetSection(nameof(SqlServerRetryOptions)));
-        services.AddOptions<ResendOptions>()
-            .Bind(configuration.GetSection(ResendOptions.SectionName))
-            .Validate(options => !string.IsNullOrWhiteSpace(options.ApiKey), "Resend API key is required.")
-            .Validate(options => !string.IsNullOrWhiteSpace(options.From), "Resend sender address is required.")
-            .ValidateOnStart();
 
         services.AddSqlConfiguration();
         services.AddHealthCheckConfiguration();
@@ -109,6 +104,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IRoleRepository, RoleRepository>();
         services.AddTransient<IPermissionRepository, PermissionRepository>();
+        services.AddTransient<INotificationRepository, NotificationRepository>();
 
     }
 
@@ -116,9 +112,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<IPasswordHasher, BCryptPasswordHasher>()
                 .AddTransient<IJwtTokenService, JwtTokenService>()
-                .AddTransient<ICacheService, CacheService>()
-                .AddTransient<IEmailSender, ResendEmailSender>();
-        ;
+                .AddTransient<ICacheService, CacheService>();
     }
 
     public static void AddRedisInfrastructure(this IServiceCollection services, IConfiguration configuration)

@@ -1,6 +1,7 @@
 using FluentValidation;
 using INuStore.UseCase.Abstractions.Services;
 using INuStore.UseCase.UseCases.V1.AuthService;
+using INuStore.UseCase.UseCases.V1.NotificationService;
 using INuStore.UseCase.UseCases.V1.PermissionService;
 using INuStore.UseCase.UseCases.V1.RoleService;
 using INuStore.UseCase.UseCases.V1.UserService;
@@ -24,6 +25,7 @@ public static class ServiceCollectionExtensions
                .AddScoped<IRoleService, RoleService>()
                .AddScoped<IPermissionService, PermissionService>()
                .AddTransient<IAuthService, AuthService>()
+               .AddScoped<FirstLoginNotificationService>()
                ;
 
     public static IServiceCollection AddAppMappings(this IServiceCollection services)

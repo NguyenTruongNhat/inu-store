@@ -15,4 +15,5 @@ public interface IUserRepository : IRepositoryBase<User, int>
     void AddUserRole(UserRole userRole);
 
     void RemoveUserRole(UserRole userRole);
+    Task<bool> TryMarkFirstLoginAsync(int userId, DateTime firstLoggedInAtUtc, CancellationToken cancellationToken = default);
 }

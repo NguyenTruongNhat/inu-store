@@ -9,5 +9,6 @@ public interface IUnitOfWork : IAsyncDisposable
 
     IPermissionRepository PermissionRepository { get; }
 
+    INotificationRepository NotificationRepository { get; }
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

@@ -8,4 +8,5 @@ internal static class TableNames
     internal const string UserRoles = nameof(UserRoles);
     internal const string RolePermissions = nameof(RolePermissions);
     internal const string Permissions = nameof(Permissions);
+    internal const string Notifications = nameof(Notifications);
 }

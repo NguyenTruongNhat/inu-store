@@ -60,4 +60,26 @@ public sealed class UserRepository : RepositoryBase<User, int>, IUserRepository
     {
         _context.UserRoles.Add(userRole);
     }
+
+    public async Task<bool> TryMarkFirstLoginAsync(int userId, DateTime firstLoggedInAtUtc, CancellationToken cancellationToken = default)
+    {
+        if (_context.Database.CurrentTransaction is null)
+        {
+            throw new InvalidOperationException(
+                "Marking first login requires an active transaction.");
+        }
+
+        var affectedRows = await _context.Users
+            .Where(user =>
+                user.Id == userId
+                && user.CreatedAtUtc != null
+                && user.FirstLoggedInAtUtc == null)
+            .ExecuteUpdateAsync(
+                setters => setters.SetProperty(
+                    user => user.FirstLoggedInAtUtc,
+                    (DateTime?)firstLoggedInAtUtc),
+                cancellationToken);
+
+        return affectedRows == 1;
+    }
 }

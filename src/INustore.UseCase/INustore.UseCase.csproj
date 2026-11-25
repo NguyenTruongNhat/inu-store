@@ -19,4 +19,9 @@
     <ProjectReference Include="..\INuStore.Domain\INuStore.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="EmailTemplates\Welcome.html"
+                      LogicalName="INuStore.UseCase.EmailTemplates.Welcome.html" />
+  </ItemGroup>
+
 </Project>

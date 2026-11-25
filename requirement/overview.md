@@ -106,7 +106,7 @@ Mục tiêu: Ôn tập authorization, policy-based authorization và quan hệ m
 Mục tiêu: Thực hành tích hợp email provider, HTML template, file đính kèm, theo dõi gửi email và in-app notification; dùng email xác thực tài khoản làm tình huống gửi email đại diện.
 
 - [x] **5.1** Gửi email.
-- [ ] **5.6** Xây dựng email template bằng HTML.
+- [x] **5.6** Xây dựng email template bằng HTML.
 - [ ] **5.7** Hỗ trợ biến động trong email template.
 - [ ] **5.8** Gửi email có file đính kèm.
 - [ ] **5.9** Tích hợp SMTP hoặc Amazon SES.

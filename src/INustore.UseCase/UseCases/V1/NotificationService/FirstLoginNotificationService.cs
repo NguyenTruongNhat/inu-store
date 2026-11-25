@@ -7,6 +7,7 @@ namespace INuStore.UseCase.UseCases.V1.NotificationService;
 
 public sealed class FirstLoginNotificationService(IUnitOfWork unitOfWork)
 {
+    private static readonly string WelcomeHtml = LoadWelcomeHtml();
     public async Task ScheduleAsync(User user, CancellationToken cancellationToken = default)
     {
         var nowUtc = DateTime.UtcNow;
@@ -26,10 +27,23 @@ public sealed class FirstLoginNotificationService(IUnitOfWork unitOfWork)
             Channel = NotificationChannel.Email,
             Recipient = user.Email,
             Subject = "Welcome to INuStore",
-            Body = "<p>Welcome to INuStore! Thank you for signing in.</p>",
+            Body = WelcomeHtml,
             Status = NotificationStatus.Pending,
             CreatedAtUtc = nowUtc,
             NextAttemptAtUtc = nowUtc
         });
+    }
+
+
+    private static string LoadWelcomeHtml()
+    {
+        const string resourceName = "INuStore.UseCase.EmailTemplates.Welcome.html";
+
+        using var stream = typeof(FirstLoginNotificationService)
+            .Assembly.GetManifestResourceStream(resourceName)
+            ?? throw new InvalidOperationException($"Email template resource '{resourceName}' was not found.");
+
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
     }
 }

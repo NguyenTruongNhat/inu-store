@@ -22,6 +22,24 @@ namespace INuStore.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("INuStore.Domain.Entities.ApplicationParameter", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasMaxLength(256)
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(256)")
+                        .UseCollation("Latin1_General_100_CI_AS");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Key");
+
+                    b.ToTable("ApplicationParameter", (string)null);
+                });
+
             modelBuilder.Entity("INuStore.Domain.Entities.Identity.Permission", b =>
                 {
                     b.Property<int>("Id")

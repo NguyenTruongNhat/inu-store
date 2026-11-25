@@ -9,4 +9,5 @@ internal static class TableNames
     internal const string RolePermissions = nameof(RolePermissions);
     internal const string Permissions = nameof(Permissions);
     internal const string Notifications = nameof(Notifications);
+    internal const string ApplicationParameter = nameof(ApplicationParameter);
 }

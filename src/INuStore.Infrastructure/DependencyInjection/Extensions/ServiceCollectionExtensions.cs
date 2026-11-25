@@ -105,6 +105,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IRoleRepository, RoleRepository>();
         services.AddTransient<IPermissionRepository, PermissionRepository>();
         services.AddTransient<INotificationRepository, NotificationRepository>();
+        services.AddTransient<IApplicationParameterRepository, ApplicationParameterRepository>();
 
     }
 

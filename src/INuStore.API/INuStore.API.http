@@ -16,9 +16,28 @@
 @managerAccessToken = replace-with-manager-access-token
 @roleId = 6
 @permissionId = 1
+@applicationParameterKey = replace-with-existing-parameter-key
 @sharedEmailUserId = replace-with-testuser-id
 @otherEmailUserId = replace-with-existing-user-with-another-email-id
 @otherEmailUserName = replace-with-that-users-current-username
+
+### Get an application parameter by key: 200; missing key: 404; requires Admin
+GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/ApplicationParameter/GetByKey?key={{applicationParameterKey}}
+Authorization: Bearer {{adminAccessToken}}
+
+### Create an application parameter: 200; duplicate key: 409; requires Admin
+POST {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/ApplicationParameter/Create
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{ "key": "ExampleFeatureEnabled", "value": "true" }
+
+### Update an application parameter: 200; missing key: 404; requires Admin
+PUT {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/ApplicationParameter/Update
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{ "key": "ExampleFeatureEnabled", "value": "false" }
 
 ### Register anonymously: 200 Result.Success(); no tokens or Redis session
 # Customer is assigned by the server. Login separately after registering.

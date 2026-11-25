@@ -2,6 +2,7 @@ using FluentValidation;
 using INuStore.UseCase.Abstractions.Notifications;
 using INuStore.UseCase.Abstractions.Services;
 using INuStore.UseCase.EmailTemplates;
+using INuStore.UseCase.UseCases.V1.ApplicationParameterService;
 using INuStore.UseCase.UseCases.V1.AuthService;
 using INuStore.UseCase.UseCases.V1.NotificationService;
 using INuStore.UseCase.UseCases.V1.PermissionService;
@@ -26,6 +27,7 @@ public static class ServiceCollectionExtensions
     => services.AddScoped<IUserService, UserService>()
                .AddScoped<IRoleService, RoleService>()
                .AddScoped<IPermissionService, PermissionService>()
+               .AddScoped<IApplicationParameterService, ApplicationParameterService>()
                .AddTransient<IAuthService, AuthService>()
                .AddScoped<FirstLoginNotificationService>()
                .AddScoped<IEmailTemplateRenderer, EmailTemplateRenderer>()

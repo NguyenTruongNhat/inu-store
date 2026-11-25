@@ -1,13 +1,14 @@
 ﻿using INuStore.Domain.Entities;
 using INuStore.Domain.Entities.Identity;
 using INuStore.Domain.Enums;
+using INuStore.UseCase.Abstractions.Notifications;
 using INuStore.UseCase.Abstractions.UnitOfWork;
+using INuStore.UseCase.EmailTemplates;
 
 namespace INuStore.UseCase.UseCases.V1.NotificationService;
 
-public sealed class FirstLoginNotificationService(IUnitOfWork unitOfWork)
+public sealed class FirstLoginNotificationService(IUnitOfWork unitOfWork, IEmailTemplateRenderer emailTemplateRenderer)
 {
-    private static readonly string WelcomeHtml = LoadWelcomeHtml();
     public async Task ScheduleAsync(User user, CancellationToken cancellationToken = default)
     {
         var nowUtc = DateTime.UtcNow;
@@ -19,6 +20,12 @@ public sealed class FirstLoginNotificationService(IUnitOfWork unitOfWork)
             return;
         }
 
+        var bodyEmail = emailTemplateRenderer.Render("Welcome",
+                                    new Dictionary<string, string>
+                                    {
+                                        ["UserName"] = user.UserName
+                                    });
+
         unitOfWork.NotificationRepository.Add(new Notification
         {
             Id = Guid.NewGuid(),
@@ -27,23 +34,10 @@ public sealed class FirstLoginNotificationService(IUnitOfWork unitOfWork)
             Channel = NotificationChannel.Email,
             Recipient = user.Email,
             Subject = "Welcome to INuStore",
-            Body = WelcomeHtml,
+            Body = bodyEmail,
             Status = NotificationStatus.Pending,
             CreatedAtUtc = nowUtc,
             NextAttemptAtUtc = nowUtc
         });
-    }
-
-
-    private static string LoadWelcomeHtml()
-    {
-        const string resourceName = "INuStore.UseCase.EmailTemplates.Welcome.html";
-
-        using var stream = typeof(FirstLoginNotificationService)
-            .Assembly.GetManifestResourceStream(resourceName)
-            ?? throw new InvalidOperationException($"Email template resource '{resourceName}' was not found.");
-
-        using var reader = new StreamReader(stream);
-        return reader.ReadToEnd();
     }
 }

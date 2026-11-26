@@ -1,6 +1,7 @@
 ﻿using INuStore.Domain.Enums;
 using INuStore.UseCase.Abstractions.Notifications;
 using INuStore.UseCase.Abstractions.UnitOfWork;
+using INuStore.UseCase.Exceptions;
 
 namespace INuStore.UseCase.UseCases.V1.NotificationService;
 
@@ -35,6 +36,11 @@ public sealed class PendingNotificationService(IUnitOfWork unitOfWork, IEmailSen
             catch (OperationCanceledException)
                 when (cancellationToken.IsCancellationRequested)
             {
+                throw;
+            }
+            catch (EmailProviderConfigurationException)
+            {
+                // This exception keep notification in pending state, so it will be retried later.
                 throw;
             }
             catch (Exception)

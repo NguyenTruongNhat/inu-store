@@ -40,6 +40,7 @@
     <File Path="technical-docs/9.ef-core-migration-walkthrough.MD" />
     <File Path="technical-docs/10.custom-permission-authorization.MD" />
     <File Path="technical-docs/10.unit-test.MD" />
+    <File Path="technical-docs/11.welcome-email-notification-flow.MD" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/INuStore.API/INuStore.API.csproj" />

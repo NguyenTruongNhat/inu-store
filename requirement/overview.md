@@ -107,9 +107,9 @@ Mục tiêu: Thực hành tích hợp email provider, HTML template, file đính
 
 - [x] **5.1** Gửi email.
 - [x] **5.6** Xây dựng email template bằng HTML.
-- [ ] **5.7** Hỗ trợ biến động trong email template.
+- [x] **5.7** Hỗ trợ biến động trong email template.
 - [ ] **5.8** Gửi email có file đính kèm.
-- [ ] **5.9** Tích hợp SMTP hoặc Amazon SES.
+- [x] **5.9** Tích hợp Resend và Amazon SES.
 - [ ] **5.10** Lưu lịch sử gửi email.
 - [ ] **5.11** Theo dõi trạng thái gửi email.
 - [ ] **5.12** Xây dựng In-App Notification.

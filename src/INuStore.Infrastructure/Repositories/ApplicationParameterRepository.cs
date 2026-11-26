@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace INuStore.Infrastructure.Repositories;
 
-public sealed class ApplicationParameterRepository(ApplicationDbContext context) : IApplicationParameterRepository
+public class ApplicationParameterRepository(ApplicationDbContext context) : IApplicationParameterRepository
 {
     public Task<ApplicationParameter?> GetByKeyAsync(
         string key, CancellationToken cancellationToken = default)

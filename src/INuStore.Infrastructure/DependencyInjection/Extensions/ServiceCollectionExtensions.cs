@@ -1,3 +1,5 @@
+using Amazon;
+using Amazon.SimpleEmailV2;
 using INuStore.Infrastructure.Authentication;
 using INuStore.Infrastructure.Caching;
 using INuStore.Infrastructure.DependencyInjection.Options;
@@ -132,14 +134,29 @@ public static class ServiceCollectionExtensions
 
         services.AddSqlConfiguration();
         services.AddRepositoryBaseConfiguration();
-        services.AddTransient<IEmailSender, ResendEmailSender>();
+
+
+        services.AddTransient<ResendEmailSender>();
+        services.AddTransient<SesEmailSender>();
+        services.AddTransient<IEmailSender, ConfigurableEmailSender>();
 
         services.AddOptions<ResendOptions>()
-            .Bind(configuration.GetSection(ResendOptions.SectionName))
-            .Validate(options => !string.IsNullOrWhiteSpace(options.ApiKey), "Resend API key is required.")
-            .Validate(options => !string.IsNullOrWhiteSpace(options.From), "Resend sender address is required.")
-            .ValidateOnStart();
+                .Bind(configuration.GetSection(ResendOptions.SectionName))
+                .ValidateDataAnnotations();
 
+        services.AddOptions<SesOptions>()
+                .Bind(configuration.GetSection(SesOptions.SectionName))
+                .ValidateDataAnnotations();
+
+        services.AddSingleton<IAmazonSimpleEmailServiceV2>(provider =>
+        {
+            var options = provider.GetRequiredService<IOptions<SesOptions>>().Value;
+
+            return new AmazonSimpleEmailServiceV2Client(
+                options.AccessKeyId,
+                options.SecretAccessKey,
+                RegionEndpoint.GetBySystemName(options.Region));
+        });
         return services;
     }
 

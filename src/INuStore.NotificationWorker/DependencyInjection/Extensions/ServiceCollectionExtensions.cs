@@ -3,16 +3,12 @@ using Hangfire.SqlServer;
 using INuStore.Infrastructure.DependencyInjection.Extensions;
 using INuStore.NotificationWorker.Jobs;
 using INuStore.UseCase.DependencyInjection.Extensions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace INuStore.NotificationWorker.DependencyInjection.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddNotificationWorker(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    public static IServiceCollection AddNotificationWorker(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("ConnectionStrings")
             ?? throw new InvalidOperationException("SQL Server connection string is required.");

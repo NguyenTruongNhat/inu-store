@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using INuStore.Domain.Entities;
+﻿using INuStore.Domain.Entities;
 using INuStore.Domain.Enums;
 
 namespace INuStore.UseCase.Abstractions.Repositories;

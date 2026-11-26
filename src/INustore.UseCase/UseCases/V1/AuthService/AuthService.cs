@@ -5,7 +5,6 @@ using INuStore.Domain.Entities.Identity;
 using INuStore.Domain.Enums;
 using INuStore.Domain.Exceptions;
 using INuStore.UseCase.Abstractions.Caching;
-using INuStore.UseCase.Abstractions.Notifications;
 using INuStore.UseCase.Abstractions.Security;
 using INuStore.UseCase.Abstractions.Services;
 using INuStore.UseCase.Abstractions.UnitOfWork;

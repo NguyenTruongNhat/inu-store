@@ -3,7 +3,6 @@ using INuStore.Domain.Entities.Identity;
 using INuStore.Domain.Enums;
 using INuStore.UseCase.Abstractions.Notifications;
 using INuStore.UseCase.Abstractions.UnitOfWork;
-using INuStore.UseCase.EmailTemplates;
 
 namespace INuStore.UseCase.UseCases.V1.NotificationService;
 

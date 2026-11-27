@@ -4,6 +4,7 @@ using INuStore.UseCase.Abstractions.Services;
 using INuStore.UseCase.EmailTemplates;
 using INuStore.UseCase.UseCases.V1.ApplicationParameterService;
 using INuStore.UseCase.UseCases.V1.AuthService;
+using INuStore.UseCase.UseCases.V1.FileService;
 using INuStore.UseCase.UseCases.V1.NotificationService;
 using INuStore.UseCase.UseCases.V1.PermissionService;
 using INuStore.UseCase.UseCases.V1.RoleService;
@@ -31,6 +32,7 @@ public static class ServiceCollectionExtensions
                .AddTransient<IAuthService, AuthService>()
                .AddScoped<FirstLoginNotificationService>()
                .AddScoped<IEmailTemplateRenderer, EmailTemplateRenderer>()
+               .AddScoped<FileService>()
                ;
 
     public static IServiceCollection AddAppMappings(this IServiceCollection services)

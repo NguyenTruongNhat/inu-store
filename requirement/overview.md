@@ -120,7 +120,7 @@ Mục tiêu: Thực hành tích hợp email provider, HTML template, file đính
 
 Mục tiêu: Ôn tập File I/O, Stream và object storage.
 
-- [ ] **6.1** Upload avatar.
+- [x] **6.1** Upload file.
 - [ ] **6.2** Upload nhiều file cùng lúc.
 - [ ] **6.3** Validate dung lượng và định dạng file.
 - [ ] **6.4** Download file.

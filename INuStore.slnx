@@ -42,6 +42,8 @@
     <File Path="technical-docs/10.unit-test.MD" />
     <File Path="technical-docs/11.welcome-email-notification-flow.MD" />
     <File Path="technical-docs/12.hangfire-notification-worker.MD" />
+    <File Path="technical-docs/13.aspnet-core-file-uploads.MD" />
+    <File Path="technical-docs/14.aspnet-core-file-uploads-v2.MD" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/INuStore.API/INuStore.API.csproj" />

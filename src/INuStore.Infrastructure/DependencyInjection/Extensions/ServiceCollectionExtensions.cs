@@ -6,15 +6,18 @@ using INuStore.Infrastructure.DependencyInjection.Options;
 using INuStore.Infrastructure.Notifications;
 using INuStore.Infrastructure.Repositories;
 using INuStore.Infrastructure.Security;
+using INuStore.Infrastructure.Storage;
 using INuStore.UseCase.Abstractions.Caching;
 using INuStore.UseCase.Abstractions.Notifications;
 using INuStore.UseCase.Abstractions.Repositories;
 using INuStore.UseCase.Abstractions.Security;
+using INuStore.UseCase.Abstractions.Storage;
 using INuStore.UseCase.Abstractions.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 
@@ -30,7 +33,7 @@ public static class ServiceCollectionExtensions
         services.AddSqlConfiguration();
         services.AddHealthCheckConfiguration();
         services.AddRepositoryBaseConfiguration();
-        services.AddInfrastructureService();
+        services.AddInfrastructureService(configuration);
         services.AddRedisInfrastructure(configuration);
 
         return services;
@@ -108,14 +111,24 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IPermissionRepository, PermissionRepository>();
         services.AddTransient<INotificationRepository, NotificationRepository>();
         services.AddTransient<IApplicationParameterRepository, ApplicationParameterRepository>();
+        services.AddTransient<IStoredFileRepository, StoredFileRepository>();
 
     }
 
-    public static void AddInfrastructureService(this IServiceCollection services)
+    public static void AddInfrastructureService(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddTransient<IPasswordHasher, BCryptPasswordHasher>()
                 .AddTransient<IJwtTokenService, JwtTokenService>()
-                .AddTransient<ICacheService, CacheService>();
+                .AddTransient<ICacheService, CacheService>()
+                .AddTransient<IFileStorage>(serviceProvider =>
+                {
+                    var environment = serviceProvider.GetRequiredService<IHostEnvironment>();
+                    var relativePath = configuration["FileStorage:Local:RootPath"]
+                        ?? "App_Data/uploads";
+
+                    var rootPath = Path.GetFullPath(relativePath, environment.ContentRootPath);
+                    return new LocalFileStorage(rootPath);
+                });
     }
 
     public static void AddRedisInfrastructure(this IServiceCollection services, IConfiguration configuration)

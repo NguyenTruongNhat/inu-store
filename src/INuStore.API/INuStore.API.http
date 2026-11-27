@@ -509,3 +509,14 @@ Authorization: Bearer {{adminAccessToken}}
 ### Invalid User ID when reading permissions (400)
 GET {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/User/0/permissions
 Authorization: Bearer {{adminAccessToken}}
+
+### Upload a buffered file
+POST {{INuStore.API_HostAddress}}/api/v{{apiVersion}}/files/buffered
+Content-Type: multipart/form-data; boundary=inustore-upload
+
+--inustore-upload
+Content-Disposition: form-data; name="file"; filename="sample.txt"
+Content-Type: text/plain
+
+Sample file content
+--inustore-upload--

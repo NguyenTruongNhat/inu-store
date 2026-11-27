@@ -92,6 +92,7 @@ dotnet ef database update --project src/INuStore.Infrastructure --startup-projec
 
 ## 5. Coding conventions
 
+- When writing C# code, keep method signatures, argument lists, and expressions on one line if they fit within 120 characters, including indentation. When a line exceeds 120 characters, wrap it at a natural break to keep the code easy to read. Follow the existing brace layout.
 - Follow `.editorconfig`: four spaces, CRLF for C#, file-scoped namespaces, System usings first, and existing brace layout.
 - Use PascalCase types/public members, `I`-prefixed interfaces, camelCase parameters/locals, and `_camelCase` private fields. Prefer descriptive domain names and readable intermediate values.
 - Keep nullable reference types and implicit usings enabled, as in every `.csproj`.
@@ -117,7 +118,7 @@ Follow the Permission feature as a concrete service-based example; change only l
 1. Confirm requested behavior, authorization, contracts, and schema scope before editing.
 2. Domain: add the entity/rule/exception beside `Entities/Identity/Permission.cs` and `Exceptions/PermissionException.cs`.
 3. Contract/UseCase: define DTOs beside `Service/V1/Permission/Command.cs`; add the service abstraction, validator, mapping, and business flow following `PermissionService.cs`.
-4. Infrastructure: implement repository operations beside `PermissionRepository.cs`; update `ApplicationDbContext`/entity configurations when needed. Stage writes without saving inside repositories.
+4. Infrastructure: implement repository operations beside `PermissionRepository.cs`; update `ApplicationDbContext`/entity configurations when needed. Stage writes without saving inside repositories. For every new concrete repository, expose its interface through a read-only property on `IUnitOfWork`, inject it into `EFUnitOfWork`, and register it in Infrastructure DI.
 5. After schema approval, generate a new migration with the command above; review its operations and generated model snapshot. Never rewrite an existing migration.
 6. API: add binding and validation attributes following `PermissionController.cs`; select explicit authorization and preserve versioned routing through `ApiController.cs`.
 7. Wire interfaces through existing DI extensions; update `.http` request/response examples and relevant docs.

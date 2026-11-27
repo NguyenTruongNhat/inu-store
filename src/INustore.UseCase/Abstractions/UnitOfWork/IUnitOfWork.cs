@@ -10,5 +10,8 @@ public interface IUnitOfWork : IAsyncDisposable
     IPermissionRepository PermissionRepository { get; }
 
     INotificationRepository NotificationRepository { get; }
+    IApplicationParameterRepository ApplicationParameterRepository { get; }
+    IStoredFileRepository StoredFileRepository { get; }
+
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }
